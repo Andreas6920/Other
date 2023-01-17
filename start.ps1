@@ -1,6 +1,7 @@
 # Install modules
 $dst = $env:PSmodulepath.split(";")[1]
 $modules = @(
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1";
     
 
 	)
