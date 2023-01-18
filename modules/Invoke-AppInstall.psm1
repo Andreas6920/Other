@@ -19,12 +19,12 @@
             Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
             
             $code = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
-            $App-Script = "$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1"
+            $appscript = "$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1"
         
-            if(!(test-path $App-Script)){new-item -ItemType Directory ($App-Script | Split-Path) -ea ignore | out-null; New-item $App-Script -ea ignore | out-null;}
-            if(!((get-content $App-Script) -notmatch "https://community.chocolatey.org/install.ps1")){Set-content -Encoding UTF8 -Value $code -Path $App-Script}
+            if(!(test-path $appscript)){new-item -ItemType Directory ($appscript | Split-Path) -ea ignore | out-null; New-item $appscript -ea ignore | out-null;}
+            if(!((get-content $appscript) -notmatch "https://community.chocolatey.org/install.ps1")){Set-content -Encoding UTF8 -Value $code -Path $appscript}
         
-            Add-content -Encoding UTF8 -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.ps1").Content.replace('REPLACE-ME-NAME', $Name).replace('REPLACE-ME-APP', $App) -Path $App-Script}
+            Add-content -Encoding UTF8 -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.ps1").Content.replace('REPLACE-ME-NAME', $Name).replace('REPLACE-ME-APP', $App) -Path $appscript}
 
             if($IncludeOffice){
             
@@ -81,9 +81,9 @@
                             # Modify install script
                                 # Download
                                     $link = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/install-office.ps1"
-                                    $App-Script = "$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1"
-                                    if(!(test-path $App-Script)){new-item -ItemType Directory ($App-Script | Split-Path) -ea ignore | out-null; New-item $App-Script -ea ignore | out-null;}
-                                    Add-content -Encoding UTF8 -Value (invoke-webrequest $link).Content.replace('REPLACE-ME-FULLNAME', $Name).replace('REPLACE-ME-VERSION', $ver).replace('REPLACE-ME-LANGUAGE', $lang) -Path $App-Script}
+                                    $appscript = "$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1"
+                                    if(!(test-path $appscript)){new-item -ItemType Directory ($appscript | Split-Path) -ea ignore | out-null; New-item $appscript -ea ignore | out-null;}
+                                    Add-content -Encoding UTF8 -Value (invoke-webrequest $link).Content.replace('REPLACE-ME-FULLNAME', $Name).replace('REPLACE-ME-VERSION', $ver).replace('REPLACE-ME-LANGUAGE', $lang) -Path $appscript}
                          
         # Start app installation              
             Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1""`""
