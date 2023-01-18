@@ -1,4 +1,4 @@
-﻿function Invoke-Huha {
+﻿function Invoke-AppInstall {
             <#param ( [Parameter(Mandatory=$true)]
                     [string]$Name,
                     [Parameter(Mandatory=$true)]
