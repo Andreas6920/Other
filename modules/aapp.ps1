@@ -29,7 +29,7 @@
 
                     # Install
                     if ($Ignorehash){$app = $app + "--ignore checksum"}
-                    Write-host "`t    -Installing: $Name" -f Yellow
+                    Write-host "`t    - Installing: $Name" -f Yellow
                     choco install $App -y | Out-Null}
 
             Write-host "`tInstalling apps:" -f green
@@ -38,7 +38,7 @@
             Install-Application -Name "ShareX" -App "sharex"
                 Stop-Process -Name sharex
             Install-Application -Name "Libre Wolf" -App "librewolf"
-                
+                iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/lib.ps1'))
             Install-Application -Name "Brave" -App "brave"
             Install-Application -Name "Google Chrome" -App "googlechrome" -ignorehash
             Install-Application -Name "Notepad++" -App "notepadplusplus"
