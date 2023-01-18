@@ -75,8 +75,7 @@
        write-host "`nLink: " -NoNewline; write-host $Output -f yellow
        if($encrypt){write-host "Password: $password"}
        if ($file -match ".ps1"){write-host "here's your execution script: " -NoNewline; write-host $Output2 -f yellow}
-       write-host "Link expiry: 14 days"
-       #write-host ""
+       write-host "Link expiry: 14 days`n"
        
        #clean-up
        remove-item $dst -Force -ErrorAction SilentlyContinue 
