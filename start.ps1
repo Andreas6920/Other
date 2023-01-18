@@ -17,7 +17,8 @@
 
     $modules = @(
     "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1";
-    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Winoptimizer-Antibloat.psm1";
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-Antibloat.psm1";
+
                     )   
     
     foreach ($module in $modules) {
@@ -36,5 +37,3 @@
 
     }
         
-
-        tin
