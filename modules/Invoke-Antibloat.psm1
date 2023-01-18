@@ -275,6 +275,6 @@
         
     #End of function
         Write-Host "`t    BLOAT REMOVER COMPLETE." -f Green
-        Start-Sleep 10
+        Start-Sleep 3
                 
 }
