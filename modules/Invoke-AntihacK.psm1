@@ -1,4 +1,4 @@
-﻿Function Invoke-AntihacK {
+﻿Function Invoke-Antihack {
     
     Function block_input{
     $code = @"
