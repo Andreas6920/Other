@@ -47,25 +47,20 @@
                Write-host "..setting password"
 
                # Rename dst file
-               $dst1 = $dst.Replace(".zip","_encrypted.zip")
-               $command = $command.Replace("$dst","$dst1")
+               $dstenc = $dst.Replace(".zip","_encrypted.zip")
+               $command = $command.Replace("$dst","$dstenc")
                
 
                # Add password parameter
-               $command = $command.Replace("$src","$src -p$password")
-               
-               
-               }
+               $command = $command.Replace("$src","$src -p$password")}
                
 
        # start compress
        Write-host "..compressing"
-       Start-Process $process -ArgumentList $command -Wait; start-sleep -s 10
-       
+       Start-Process $process -ArgumentList $command -Wait;
        
        # Upload
-       
-       if ($encrypt){$dst = $dst1}
+       if ($encrypt){$dst = $dstenc}
        $f = Get-Item $dst
        Write-host "..uploading"
        $output = (Invoke-WebRequest -Method PUT -InFile $f.FullName -Uri https://transfer.sh/$($f.Name)).Content
