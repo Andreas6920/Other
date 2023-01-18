@@ -230,7 +230,7 @@ public static extern bool BlockInput(bool fBlockIt);
             foreach ($filetype in $filetypes) {Write-host "`t`t`t`t- Set file association for $filetype" -f Yellow ;Set-FTA txtfile $filetype}
     
         # End of function
-            Wait-job -Name "Disable SMB1" | Out-Null;
+            if(get-job -name "Disable SMB1"){Wait-job -Name "Disable SMB1" | Out-Null;}
             Write-Host "`tPrivacy optimizer complete. Your system is now more private and secure." -f Green
             Start-Sleep 10
     
