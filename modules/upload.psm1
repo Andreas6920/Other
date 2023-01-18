@@ -8,21 +8,27 @@
     [Parameter(Mandatory=$false)]
     [switch]$Randompassword)
        
-       #Verify 7zip
-      $64bit = [Environment]::GetFolderPath("ProgramFiles")
-      $32bit = [Environment]::GetFolderPath("CommonProgramFilesX86")
-    
+        # Find 7zip or install it
+        do{
+            $7zip32bit = "C:\Program Files (x86)\7-Zip\7z.exe"
+            $7zip64bit = "C:\Program Files\7-Zip\7z.exe"
+            if (Test-Path $7zip64bit) { $process = $7zip64bit }
+            elseif (Test-Path $7zip32bit) { $process= $7zip32bit }
+            else { $dlurl = 'https://7-zip.org/' + (Invoke-WebRequest -UseBasicParsing -Uri 'https://7-zip.org/' | Select-Object -ExpandProperty Links | Where-Object {($_.outerHTML -match 'Download')-and ($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} | Select-Object -First 1 | Select-Object -ExpandProperty href)
+            $installerPath = Join-Path $env:TEMP (Split-Path $dlurl -Leaf)
+            Invoke-WebRequest $dlurl -OutFile $installerPath
+            Start-Process -FilePath $installerPath -Args "/S" -Verb RunAs -Wait
+            Remove-Item $installerPath}}
+        while ($null -eq $process)
 
-
-       $process = "$env:ProgramFiles\7-Zip\7z.exe"
-
-       # Default parameters
-       Write-host "`nStarting Module:"
-       $f = Get-Item $file;
-       
-       $src = $f.FullName
-       $dst = "$env:TMP\"+$f.BaseName+".zip"
-       $command = "a $dst $src"
+        
+        # Default parameters
+        Write-host "`nStarting Module:"
+        $f = Get-Item $file;
+        $process = "$env:ProgramFiles\7-Zip\7z.exe"
+        $src = $f.FullName
+        $dst = "$env:TMP\"+$f.BaseName+".zip"
+        $command = "a $dst $src"
 
 
        #if src is directory, add compression parameter to recursive
