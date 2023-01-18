@@ -18,6 +18,9 @@
     $modules = @(
     "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1";
     "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Add-Reg.ps1";
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Restart-Explorer.ps1";
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Start-Input.ps1";
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Stop-Input.ps1";
     "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-Antibloat.psm1";
     "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-AntihacK.psm1";
 
@@ -25,7 +28,6 @@
     
     foreach ($module in $modules) {
     $file = (split-path $module -Leaf)
-    $file = $file.substring(0,1).toupper()+$file.substring(1).tolower()
     $filename = $file.Replace(".psm1","").Replace(".ps1","").Replace(".psd","")
     $filedestination = "$modulepath/$filename/$file"
     $filesubfolder = split-path $filedestination -Parent

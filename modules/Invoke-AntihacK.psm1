@@ -1,6 +1,6 @@
 ﻿Function Invoke-Antihack {
     
-    Function block_input{
+    Function Stop-Input{
     $code = @"
 [DllImport("user32.dll")]
 public static extern bool BlockInput(bool fBlockIt);
@@ -9,7 +9,7 @@ public static extern bool BlockInput(bool fBlockIt);
     $userInput::BlockInput($true)
     }
 
-    Function allow_input{
+    Function Start-Input{
     $code = @"
 [DllImport("user32.dll")]
 public static extern bool BlockInput(bool fBlockIt);
@@ -125,7 +125,7 @@ public static extern bool BlockInput(bool fBlockIt);
     # Send Microsoft a request to delete collected data about you.
         
         #lock keyboard and mouse to avoid disruption while navigating in GUI.
-        block_input | Out-Null
+        Stop-Input | Out-Null
         Write-Host "`t`tSUBMIT - request to Microsoft to delete data about you." -f Green
         Start-Sleep -s 2
         #start navigating
@@ -147,7 +147,7 @@ public static extern bool BlockInput(bool fBlockIt);
         Start-Sleep -s 2
         
         #unlocking keyboard and mouse
-        allow_input | Out-Null
+        Start-Input | Out-Null
         
         # Windows hardening
         Write-Host "`n`tENHANCE WINDOWS SECURITY" -f Green
