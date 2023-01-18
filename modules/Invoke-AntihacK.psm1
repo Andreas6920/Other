@@ -214,7 +214,7 @@ public static extern bool BlockInput(bool fBlockIt);
             Write-Host "`t`t`t- Enabling LSA protection." -f Yellow
             Add-Reg -Path "HKLM:\SYSTEM\CurrentControlSet\Control\LSA" -Name "RunAsPPL" -Type "DWORD" -Value "1"
 
-        # Change File association on typical malicious files to prevent accidental launching
+        # Change File association on typical malicious files to preventing accidental launching
             # https://www.reddit.com/r/sysadmin/comments/uvxzge/security_cadence_use_default_apps_to_help_prevent/
             Write-host "`t`t`t- Setting file association for prevent accidental launching:" -f Yellow
             $link = "https://raw.githubusercontent.com/DanysysTeam/PS-SFTA/master/SFTA.ps1"
