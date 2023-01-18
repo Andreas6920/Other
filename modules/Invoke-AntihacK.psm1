@@ -1,4 +1,4 @@
-﻿Function settings_privacy {
+﻿Function Invoke-AntihacK {
     
     Function block_input{
     $code = @"
