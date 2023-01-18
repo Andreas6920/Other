@@ -8,11 +8,18 @@
     [Parameter(Mandatory=$false)]
     [switch]$Randompassword)
        
-       
-       #Default parameters
+       #Verify 7zip
+      $64bit = [Environment]::GetFolderPath("ProgramFiles")
+      $32bit = [Environment]::GetFolderPath("CommonProgramFilesX86")
+    
+
+
+       $process = "$env:ProgramFiles\7-Zip\7z.exe"
+
+       # Default parameters
        Write-host "`nStarting Module:"
        $f = Get-Item $file;
-       $process = "$env:ProgramFiles\7-Zip\7z.exe"
+       
        $src = $f.FullName
        $dst = "$env:TMP\"+$f.BaseName+".zip"
        $command = "a $dst $src"
