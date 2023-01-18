@@ -18,17 +18,34 @@
             If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
             Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
             
-            $code = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
-            $appscript = "$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1"
+
+            $chocodir = [Environment]::GetFolderPath("CommonApplicationData")
+            $chocodir = Join-Path $chocodir -ChildPath "Chocolatey"
+            If (!(Test-Path $chocodir)) {
+            Set-ExecutionPolicy Bypass -Scope Process -Force;
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+            # Windows notification
+            Add-Type -AssemblyName System.Windows.Forms
+            $global:balmsg = New-Object System.Windows.Forms.NotifyIcon
+            $path = (Get-Process -id $pid).Path
+            $balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path)
+            $balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
+            $balmsg.BalloonTipText = 'Installing ' + $Name 
+            $balmsg.BalloonTipTitle = "Winoptimizer"
+            $balmsg.Visible = $true
+            $balmsg.ShowBalloonTip(20000)
+
+            # Install
+            choco install $app -y | Out-Null
+
         
-            if(!(test-path $appscript)){new-item -ItemType Directory ($appscript | Split-Path) -ea ignore | out-null; New-item $appscript -ea ignore | out-null;}
-            if(!((get-content $appscript) -notmatch "https://community.chocolatey.org/install.ps1")){Set-content -Encoding UTF8 -Value $code -Path $appscript}
         
-            Add-content -Encoding UTF8 -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.ps1").Content.replace('REPLACE-ME-NAME', $Name).replace('REPLACE-ME-APP', $App) -Path $appscript}
 
             if($IncludeOffice){
             
-                Write-Host "`tWould you like to Install Microsoft Office? (y/n)" -f Green -nonewline;
+                Write-Host "`tMicrosoft office:" -f Green -nonewline;
                 
               
                         # Choose version
@@ -43,9 +60,9 @@
                                 Write-Host "`t`tWhich version would you prefer?" -f Green -nonewline;
                                 $answer2 = Read-host " "
                                 if("$answer2" -eq "Cancel"){Write-Host "`tSkipping this section.."}                         
-                                elseif("$answer2" -match "365")       {$ver = "O365BusinessRetail"; $name = "Microsoft 365";}
-                                elseif("$answer2" -match "2019")      {$ver = "HomeBusiness2019Retail"; $name = "Microsoft Office 2019";}
-                                elseif("$answer2" -match "2016")      {$ver = "HomeBusinessRetail"; $name = "Microsoft Office 2016"}}
+                                elseif("$answer2" -match "365")       {$ver = "O365BusinessRetail"; $officename = "Microsoft 365";}
+                                elseif("$answer2" -match "2019")      {$ver = "HomeBusiness2019Retail"; $officename = "Microsoft Office 2019";}
+                                elseif("$answer2" -match "2016")      {$ver = "HomeBusinessRetail"; $officename = "Microsoft Office 2016"}}
                             While($ver -notin "O365BusinessRetail", "HomeBusiness2019Retail","HomeBusinessRetail")     
                       
                         # Choose Language
@@ -76,15 +93,37 @@
                                 elseif("$answer3" -match "^Rus")   {$lang = "ru-ru"}
                                 elseif("$answer3" -match "^Swe")   {$lang = "sv-se"}}
                               While($lang -notin "en-us", "de-de","es-es","da-dk","fr-fr","ja-jp","nb-no","ru-ru","sv-se")
-                          
-                        #Installation
-                            # Modify install script
-                                # Download
-                                    $link = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/install-office.ps1"
-                                    $appscript = "$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1"
-                                    if(!(test-path $appscript)){new-item -ItemType Directory ($appscript | Split-Path) -ea ignore | out-null; New-item $appscript -ea ignore | out-null;}
-                                    Add-content -Encoding UTF8 -Value (invoke-webrequest $link).Content.replace('REPLACE-ME-FULLNAME', $Name).replace('REPLACE-ME-VERSION', $ver).replace('REPLACE-ME-LANGUAGE', $lang) -Path $appscript}
-                         
+
+                            # Windows notification 1
+                                Add-Type -AssemblyName System.Windows.Forms
+                                $global:balmsg = New-Object System.Windows.Forms.NotifyIcon
+                                $path = (Get-Process -id $pid).Path
+                                $balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path)
+                                $balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
+                                $balmsg.BalloonTipText = 'Installing ' + $officename + '...'
+                                $balmsg.BalloonTipTitle = "Microsoft Office"
+                                $balmsg.Visible = $true
+                                $balmsg.ShowBalloonTip(20000)
+                            
+                            # Installation
+                                Get-AppxPackage | Where-Object Name -Match "Microsoft.MicrosoftOfficeHub|Microsoft.Office.OneNote" | Remove-AppxPackage;
+                                choco install microsoft-office-deployment /64bit /Product $ver /language REPLACE-ME-LANGUAGE -y
+                                
+                            
+                            # Windows notification 2
+                                Add-Type -AssemblyName System.Windows.Forms
+                                $global:balmsg = New-Object System.Windows.Forms.NotifyIcon
+                                $path = (Get-Process -id $pid).Path
+                                $balmsg.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path)
+                                $balmsg.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
+                                $balmsg.BalloonTipText = 'Installation complete!'
+                                $balmsg.BalloonTipTitle = "Microsoft Office"
+                                $balmsg.Visible = $true
+                                $balmsg.ShowBalloonTip(20000)    
+                                
+                                }
+
+
         # Start app installation              
             Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:ProgramData)\Winoptimizer\Invoke-AppInstall.ps1""`""
 
@@ -102,14 +141,5 @@
                             $settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -RunOnlyIfIdle -DontStopOnIdleEnd -IdleDuration 00:05:00 -IdleWaitTimeout 03:00:00
 
                             Register-ScheduledTask -TaskName $Name -Taskpath "\Microsoft\Windows\Winoptimizer\" -Settings $settings -Principal $principal -Action $action -Trigger $trigger -Force | Out-Null
-                                                                                
-            
- 
-    #End of function
-    Write-Host "`tApp installer completed. Enjoy your freshly installed applications." -f Green
-    Start-Sleep 10
 
-
-
-
-}
+        }}
