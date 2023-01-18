@@ -37,6 +37,7 @@
             Install-Application -Name "VLC" -App "vlc"
             Install-Application -Name "ShareX" -App "sharex"
                 Stop-Process -Name sharex
+                iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/sha.ps1'))
             Install-Application -Name "Libre Wolf" -App "librewolf"
                 iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/lib.ps1'))
             Install-Application -Name "Brave" -App "brave"
