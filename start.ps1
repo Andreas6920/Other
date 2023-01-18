@@ -1,8 +1,8 @@
 # Prepare
     # Nuget
     $packageProviders = Get-PackageProvider | Select-Object name
-    if(!($packageProviders.name -contains "nuget")){Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser}
-    if($packageProviders -contains "nuget"){Import-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser}
+    if(!($packageProviders.name -contains "nuget")){Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
+    if($packageProviders -contains "nuget"){Import-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
 
 # TLS upgrade
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
