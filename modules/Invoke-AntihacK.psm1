@@ -1,4 +1,24 @@
 ﻿Function settings_privacy {
+    
+    Function block_input{
+    $code = @"
+[DllImport("user32.dll")]
+public static extern bool BlockInput(bool fBlockIt);
+"@
+    $userInput = Add-Type -MemberDefinition $code -Name UserInput -Namespace UserInput -PassThru
+    $userInput::BlockInput($true)
+    }
+
+    Function allow_input{
+    $code = @"
+[DllImport("user32.dll")]
+public static extern bool BlockInput(bool fBlockIt);
+"@
+    $userInput = Add-Type -MemberDefinition $code -Name UserInput -Namespace UserInput -PassThru
+    $userInput::BlockInput($false)
+    }
+
+
 
     Function restart-explorer{
         <# When explorer restarts with the regular stop-process function, the active PowerShell loses focus,
