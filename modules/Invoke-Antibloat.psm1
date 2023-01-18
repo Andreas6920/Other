@@ -35,7 +35,7 @@
     
     # Clean Apps and features
         # List
-        Write-Host "`t`tCleaning Bloatware:" -f Green
+        Write-Host "`t    Cleaning Bloatware:" -f Green
         Start-Sleep -s 5
         $Bloatware = @(		
             ## Microsoft Bloat ##
@@ -110,15 +110,15 @@
             $ProgressPreference = "SilentlyContinue" # hide progressbar
             foreach ($Bloat in $Bloatware) {
                 $bloat_name = (Get-AppxPackage | Where-Object Name -Like $Bloat).Name
-                if (Get-AppxPackage | Where-Object Name -Like $Bloat){Write-Host "`t`t`t- Removing: " -f Yellow -nonewline; Write-Host "$bloat_name".Split(".")[1].Split("}")[0].Replace('Microsoft','') -f Yellow; Get-AppxPackage | Where-Object Name -Like $Bloat | Remove-AppxPackage -ErrorAction SilentlyContinue | Out-Null}
+                if (Get-AppxPackage | Where-Object Name -Like $Bloat){Write-Host "`t        - Removing: " -f Yellow -nonewline; Write-Host "$bloat_name".Split(".")[1].Split("}")[0].Replace('Microsoft','') -f Yellow; Get-AppxPackage | Where-Object Name -Like $Bloat | Remove-AppxPackage -ErrorAction SilentlyContinue | Out-Null}
                 Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online | Out-Null} 
             $ProgressPreference = "Continue" #unhide progressbar
-            Write-Host "`t`t`t- Cleaning complete." -f Yellow;  Start-Sleep -S 3;
+            Write-Host "`t        - Cleaning complete." -f Yellow;  Start-Sleep -S 3;
 
 
 
     # Disabling services
-        Write-Host "`t`tCleaning Startup services:" -f Green
+        Write-Host "`t    Cleaning Startup services:" -f Green
         Start-Sleep -s 3
         $services = @(
             "diagnosticshub.standardcollector.service" # Microsoft (R) Diagnostics Hub Standard Collector Service
@@ -141,14 +141,14 @@
 
          foreach ($service in $services) {
          if((Get-Service -Name $service | Where-Object Starttype -ne Disabled)){
-         Write-Host "`t`t`t- Disabling: $service" -f Yellow
+         Write-Host "`t        - Disabling: $service" -f Yellow
          Get-Service | Where-Object name -eq $service | Set-Service -StartupType Disabled}}
-         Write-Host "`t`t`t- Cleaning complete." -f Yellow;  Start-Sleep -S 3;
+         Write-Host "`t        - Cleaning complete." -f Yellow;  Start-Sleep -S 3;
 
 
 
     # Clean Task Scheduler
-        Write-Host "`t`tCleaning Scheduled tasks:" -f Green
+        Write-Host "`t    Cleaning Scheduled tasks:" -f Green
         Start-Sleep -s 3
         $Bloatschedules = @(
             "AitAgent" 
@@ -194,14 +194,14 @@
 
             foreach ($BloatSchedule in $BloatSchedules) {
             if ((Get-ScheduledTask | Where-Object state -ne Disabled | Where-Object TaskName -like $BloatSchedule)){
-            Write-Host "`t`t`t- Disabling: $BloatSchedule" -f Yellow
+            Write-Host "`t        - Disabling: $BloatSchedule" -f Yellow
             Get-ScheduledTask | Where-Object Taskname -eq $BloatSchedule | Disable-ScheduledTask | Out-Null}}
-            Write-Host "`t`t`t- Cleaning complete." -f Yellow;  Start-Sleep -S 3;
+            Write-Host "`t        - Cleaning complete." -f Yellow;  Start-Sleep -S 3;
         
 
             
     # Clean start menu
-        Write-Host "`t`tCleaning Start Menu:" -f Green
+        Write-Host "`t    Cleaning Start Menu:" -f Green
         Start-Sleep -s 3
     
             # Prepare
@@ -210,37 +210,37 @@
             $keys = "HKLM:\Software\Policies\Microsoft\Windows\Explorer","HKCU:\Software\Policies\Microsoft\Windows\Explorer"; 
                 
             # Download blank Start Menu file
-            Write-Host "`t`t`t- Downloading Start Menu file..." -f Yellow;
+            Write-Host "`t        - Downloading Start Menu file..." -f Yellow;
             (New-Object net.webclient).Downloadfile("$link", "$file"); 
                             
             # Unlock start menu, disable pinning, replace with blank file
-            Write-Host "`t`t`t- Unlocking and replacing current file..." -f Yellow;
+            Write-Host "`t        - Unlocking and replacing current file..." -f Yellow;
             $keys | % { if(!(test-path $_)){ New-Item -Path $_ -Force | Out-Null; Set-ItemProperty -Path $_ -Name "LockedStartLayout" -Value 1; Set-ItemProperty -Path $_ -Name "StartLayoutFile" -Value $File } }
             
             # Restart explorer
             restart-explorer
 
             # Enable pinning
-            Write-Host "`t`t`t- Fixing pinning..." -f Yellow
+            Write-Host "`t        - Fixing pinning..." -f Yellow
             $keys | % { Set-ItemProperty -Path $_ -Name "LockedStartLayout" -Value 0 }
             
             #Restart explorer
             restart-explorer
 
             # Save menu to all users
-            Write-Host "`t`t`t- Save changes to all users.." -f Yellow
+            Write-Host "`t        - Save changes to all users.." -f Yellow
             Import-StartLayout -LayoutPath $File -MountPath $env:SystemDrive\
 
             # Clean up after script
             Remove-Item $File
-            Write-Host "`t`t`t- Cleaning complete." -f Yellow;  Start-Sleep -S 3;
+            Write-Host "`t        - Cleaning complete." -f Yellow;  Start-Sleep -S 3;
 
         
     # Clean Taskbar
-        Write-Host "`t`tCleaning Taskbar:" -f Green
+        Write-Host "`t    Cleaning Taskbar:" -f Green
         Start-Sleep -s 5
         
-            Write-Host "`t`t`t- Changing keys.." -f Yellow
+            Write-Host "`t        - Changing keys.." -f Yellow
             Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesChanges -Value 3 -Type Dword -Force | Out-Null
             Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesRemovedChanges -Value 32 -Type Dword -Force | Out-Null
             Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesVersion -Value 3 -Type Dword -Force | Out-Null
@@ -249,32 +249,32 @@
             Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Search -Name SearchboxTaskbarMode -Value 0 -Type Dword | Out-Null
             Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowTaskViewButton -Type DWord -Value 0 | Out-Null
 
-            Write-Host "`t`t`t- Removing shortcuts.." -f Yellow
+            Write-Host "`t        - Removing shortcuts.." -f Yellow
             Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Recurse -Force | Out-Null
             restart-explorer
-            Write-Host "`t`t`t- Cleaning complete." -f Yellow;  Start-Sleep -S 3;
+            Write-Host "`t        - Cleaning complete." -f Yellow;  Start-Sleep -S 3;
 
         
     # Cleaning printers
-        Write-Host "`t`tCleaning Printers:" -f Green
+        Write-Host "`t    Cleaning Printers:" -f Green
         Start-Sleep -s 5    
         
-            Write-Host "`t`t`t- Disabling auto-install printers from network.." -f Yellow
+            Write-Host "`t        - Disabling auto-install printers from network.." -f Yellow
             Add-Reg -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\NcdAutoSetup\Private" -Name "AutoSetup" -Type DWord -Value 0
             
-            Write-Host "`t`t`t- Cleaning spooler" -f Yellow
+            Write-Host "`t        - Cleaning spooler" -f Yellow
             Stop-Service "Spooler" | out-null; sleep -s 3
             Remove-Item "$env:SystemRoot\System32\spool\PRINTERS\*.*" -Force | Out-Null
             Start-Service "Spooler"
 
-            Write-Host "`t`t`t- Removing bloat printers:" -f Yellow
+            Write-Host "`t        - Removing bloat printers:" -f Yellow
             $Bloatprinters = "Fax","OneNote for Windows 10","Microsoft XPS Document Writer", "Microsoft Print to PDF" 
-            $Bloatprinters | % {if(Get-Printer | Where-Object Name -cMatch $_){Write-Host "`t`t`t`t- Uninstalling: $_" -f Yellow; Remove-Printer $_; Start-Sleep -s 2}}
-            Write-Host "`t`t`t- Cleaning complete." -f Yellow;  Start-Sleep -S 3;
+            $Bloatprinters | % {if(Get-Printer | Where-Object Name -cMatch $_){Write-Host "`t                - Uninstalling: $_" -f Yellow; Remove-Printer $_; Start-Sleep -s 2}}
+            Write-Host "`t        - Cleaning complete." -f Yellow;  Start-Sleep -S 3;
 
         
     #End of function
-        Write-Host "`t`tBLOAT REMOVER COMPLETE." -f Green
+        Write-Host "`t    BLOAT REMOVER COMPLETE." -f Green
         Start-Sleep 10
                 
 }
