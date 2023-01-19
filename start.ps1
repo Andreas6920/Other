@@ -16,14 +16,16 @@
     $modulepath = $env:PSmodulepath.split(";")[1]
 
     $modules = @(
-    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1";
-    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-AntihacK.psm1";
-    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-Antibloat.psm1";
+    #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1";
+    #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-AntihacK.psm1";
+    #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-Antibloat.psm1";
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Invoke-AppInstall.psm1";
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Add-Reg.ps1";
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Restart-Explorer.ps1";
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Start-Input.ps1";
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Stop-Input.ps1";
+    #"https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"
+    "https://transfer.sh/GoaS8Y/Winoptimizer.psm1"
 
                     )   
     
@@ -41,9 +43,11 @@
     Import-module -name $filename
 
     }
+      
     
-    Invoke-Antibloat
-
-    Invoke-Antihack
-
-    
+    <#
+        - Start script customize windows
+        - run script (windos minimized) Invoke-Antibloat
+        - run script (windos minimized) Invoke-Antihack
+        - run script (windos minimized) AM-settings
+    #>
