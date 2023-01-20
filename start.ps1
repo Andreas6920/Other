@@ -25,8 +25,8 @@
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Start-Input.ps1";
     #"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/Stop-Input.ps1";
     #"https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"
-    "https://transfer.sh/GoaS8Y/Winoptimizer.psm1"
-
+    #"https://transfer.sh/GoaS8Y/Winoptimizer.psm1"
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/Winoptimizer2.psm1"
                     )   
     
     foreach ($module in $modules) {
@@ -43,6 +43,8 @@
     Import-module -name $filename
 
     }
+
+    Get-Module -ListAvailable
       
     
     <#
