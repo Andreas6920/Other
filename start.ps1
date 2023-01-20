@@ -44,7 +44,7 @@
 
     }
 
-    Get-Module -ListAvailable
+    (get-module | where name -eq Winoptimizer2).ExportedCommands
       
     
     <#
