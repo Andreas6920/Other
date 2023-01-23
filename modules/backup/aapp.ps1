@@ -48,5 +48,6 @@
             Install-Application -Name "Gimp" -App "gimp"
             Install-Application -Name "Spotify" -App "spotify"
             Install-Application -Name "Github Desktop" -App "github-desktop"
+            Install-Application -Name "PowerShell Core" -App "powershell-core"
 
 
