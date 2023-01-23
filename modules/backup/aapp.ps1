@@ -42,12 +42,24 @@
                 iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/lib.ps1'))
             Install-Application -Name "Brave" -App "brave"
             Install-Application -Name "Google Chrome" -App "googlechrome" -ignorehash
+            Install-Application -Name "PowerShell Core" -App "powershell-core"
+            Install-Application -Name "Windows Terminal" -App "microsoft-windows-terminal"
             Install-Application -Name "Notepad++" -App "notepadplusplus"
-            Install-Application -Name "PuTTY" -App "putty"
             Install-Application -Name "Visual Studio Code" -App "vscode"
+            Install-Application -Name "PuTTY" -App "putty"
             Install-Application -Name "Gimp" -App "gimp"
             Install-Application -Name "Spotify" -App "spotify"
             Install-Application -Name "Github Desktop" -App "github-desktop"
-            Install-Application -Name "PowerShell Core" -App "powershell-core"
+
+
+
+            $url = 'https://github.com/PowerShell/PowerShell/releases/latest'
+            $request = [System.Net.WebRequest]::Create($url)
+            $response = $request.GetResponse()
+            $realTagUrl = $response.ResponseUri.OriginalString
+            $version = $realTagUrl.split('/')[-1].Trim('v')
+            $fileName = "PowerShell-$version-win-x64.msi"
+            $realDownloadUrl = $realTagUrl.Replace('tag', 'download') + '/' + $fileName
+            $realDownloadUrl
 
 
