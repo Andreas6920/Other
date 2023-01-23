@@ -421,10 +421,10 @@ Function Start-WinTuneAntiHack {
         # Bad Neighbor - CVE-2020-16898 (Disable IPv6 DNS)
             # https://blog.rapid7.com/2020/10/14/there-goes-the-neighborhood-dealing-with-cve-2020-16898-a-k-a-bad-neighbor/
             Write-Host "`t`t`t- Patching Bad Neighbor (CVE-2020-16898)." -f Yellow
-                # Disable DHCPv6  + routerDiscovery
-                Set-NetIPInterface -AddressFamily IPv6 -InterfaceIndex $(Get-NetIPInterface -AddressFamily IPv6 | Select-Object -ExpandProperty InterfaceIndex) -RouterDiscovery Disabled -Dhcp Disabled
-                # Prefer IPv4 over IPv6 (IPv6 is prefered by default)
-                Add-Reg -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name "DisabledComponents" -Type "DWORD" -Value "0x20"
+            # Disable DHCPv6  + routerDiscovery
+            Set-NetIPInterface -AddressFamily IPv6 -InterfaceIndex $(Get-NetIPInterface -AddressFamily IPv6 | Select-Object -ExpandProperty InterfaceIndex) -RouterDiscovery Disabled -Dhcp Disabled
+            # Prefer IPv4 over IPv6 (IPv6 is prefered by default)
+            Add-Reg -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name "DisabledComponents" -Type "DWORD" -Value "0x20"
         
         # Disabe SMB Compression - CVE-2020-0796
             # https://msrc.microsoft.com/update-guide/en-US/vulnerability/CVE-2020-0796
@@ -1018,30 +1018,27 @@ Function Start-WinTuneAppinstall {
         # Start app installation              
             Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:ProgramData)\Winoptimizer\appinstall.ps1""`""
     
-    
-            Do {
-                Write-Host "`tWould you like to install auto-updater? (y/n)" -f Green -nonewline;
-                $answer = Read-Host " " 
-                Switch ($answer) { 
-                    Y {   
-                            #create update file
-                            Write-Host "`t`t- Downloading updating script." -f Yellow
-                            $filepath = "$env:ProgramData\chocolatey\app-updater.ps1"
-                            Invoke-WebRequest -uri "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/app-updater/app-updater.ps1" -OutFile $filepath -UseBasicParsing
-                            
-                            # Create scheduled job
-                            Write-Host "`t`t- scheduling update routine." -f Yellow
-                            $name = 'winoptimizer-app-Updater'
-                            $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-nop -W hidden -noni -ep bypass -file $filepath"
-                            $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM"-LogonType ServiceAccount -RunLevel Highest
-                            $trigger= New-ScheduledTaskTrigger -At 12:05 -Daily
-                            $settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -RunOnlyIfIdle -DontStopOnIdleEnd -IdleDuration 00:05:00 -IdleWaitTimeout 03:00:00
-
-                            Register-ScheduledTask -TaskName $Name -Taskpath "\Microsoft\Windows\Winoptimizer\" -Settings $settings -Principal $principal -Action $action -Trigger $trigger -Force | Out-Null
-                                                                                
-                    }
-                    N { Write-Host "`t`t- NO. Skipping this step." -f Red }}} 
-            While ($answer -notin "y", "n")
+        # Setup app updater
+        
+            # Wizard
+                If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
+                    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+                Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
+            
+            # Create update file
+                Write-Host "`t`t- Downloading updating script." -f Yellow
+                $filepath = "$env:ProgramData\app-updater.ps1"
+                Invoke-WebRequest -uri "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/app-updater/app-updater.ps1" -OutFile $filepath -UseBasicParsing
+            
+            # Create scheduled job
+                Write-Host "`t`t- scheduling update routine." -f Yellow
+                $name = 'App-Updater'
+                $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-W hidden -ep bypass -file $filepath"
+                $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType ServiceAccount -RunLevel Highest
+                $trigger= New-ScheduledTaskTrigger -At 12:00 -Daily
+                $settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries -DontStopOnIdleEnd -StartWhenAvailable
+            
+                Register-ScheduledTask -TaskName $Name -Settings $settings -Principal $principal -Action $action -Trigger $trigger -Force | Out-Null
 
             
  
