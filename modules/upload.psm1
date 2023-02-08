@@ -8,6 +8,11 @@
     [Parameter(Mandatory=$false)]
     [switch]$Randompassword)
        
+        # Disable Explorer first run
+        If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
+        New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+        Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
+    
         # Find 7zip or install it
         do{
             $7zip32bit = "C:\Program Files (x86)\7-Zip\7z.exe"
