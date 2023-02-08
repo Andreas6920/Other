@@ -38,49 +38,31 @@ function Install-Application {
     Install-Application -Name "VLC" -App "vlc"
     Install-Application -Name "ShareX" -App "sharex"
         Stop-Process -Name sharex
-        #iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/sha.ps1'))
+        write-host "`t`t`t- Importing settings" -f Yellow
+        $link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=13xOvgOXgOkdLuGG-JqQiVQla6Gz6Sria"
+        $src = "$env:TMP\sharexprofile.zip"
+        write-host "`t`t`t- Downloading to settings" -f Yellow
+        (New-Object net.webclient).Downloadfile($link, $src);
+        $dst = [Environment]::GetFolderPath("MyDocuments")
+        $dst = Join-path $dst -ChildPath "Sharex"
+        Expand-Archive -Path $src -DestinationPath $dst -Force
     Install-Application -Name "Libre Wolf" -App "librewolf"
-        #iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/lib.ps1'))
+        $link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=1m8TZD7d9nc-Vkmv1PgyyXwUMuNgFrI3s"
+        $src = "$env:TMP\librewolfprofile.zip"
+        write-host "`t`t`t- Downloading to settings" -f Yellow
+        (New-Object net.webclient).Downloadfile($link, $src); Start-Sleep -s 2
+        write-host "`t`t`t- Building profile" -f Yellow
+        Start-Process "C:\Program Files\LibreWolf\librewolf.exe"
+        Start-Sleep -s 5
+        Stop-Process -name "librewolf"
     Install-Application -Name "Brave" -App "brave"
     Install-Application -Name "Google Chrome" -App "googlechrome" -ignorehash
     Install-Application -Name "Notepad++" -App "notepadplusplus"
     Install-Application -Name "PuTTY" -App "putty"
     Install-Application -Name "Visual Studio Code" -App "vscode"
+    Install-Application -Name "PowerShell Core" -App "powershell-core"
+    Install-Application -Name "Windows Terminal" -App "microsoft-windows-terminal"
     Install-Application -Name "Gimp" -App "gimp"
     Install-Application -Name "Spotify" -App "spotify"
     Install-Application -Name "Github Desktop" -App "github-desktop"
-    Install-Application -Name "PowerShell Core" -App "powershell-core"
-    Install-Application -Name "Windows Terminal" -App "microsoft-windows-terminal"
-
-
-<#
-# Install Librewolf settings
-$link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=1m8TZD7d9nc-Vkmv1PgyyXwUMuNgFrI3s"
-$src = "$env:TMP\librewolfprofile.zip"
-write-host "`t`t`t- Downloading to settings" -f Yellow
-(New-Object net.webclient).Downloadfile($link, $src); Start-Sleep -s 2
-
-write-host "`t`t`t- Building profile" -f Yellow
-Start-Process "C:\Program Files\LibreWolf\librewolf.exe"
-Start-Sleep -s 5
-Stop-Process -name "librewolf"
-
-$dst = [Environment]::GetFolderPath("ApplicationData")
-$dst = Join-path $dst -ChildPath "librewolf\Profiles"
-$dst = (gci $dst | ? name -match "-default?$").FullName
-Start-Sleep -s 10
-write-host "`t`t`t- Importing settings" -f Yellow
-Expand-Archive -Path $src -DestinationPath $dst -Force
-Start-Sleep -s 5
-
-# Install ShareX settings
-$link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=13xOvgOXgOkdLuGG-JqQiVQla6Gz6Sria"
-$src = "$env:TMP\sharexprofile.zip"
-write-host "`t`t`t- Downloading to settings" -f Yellow
-(New-Object net.webclient).Downloadfile($link, $src);
-
-write-host "`t`t`t- Importing settings" -f Yellow
-$dst = [Environment]::GetFolderPath("MyDocuments")
-$dst = Join-path $dst -ChildPath "Sharex"
-Expand-Archive -Path $src -DestinationPath $dst -Force
-#> 
+    
