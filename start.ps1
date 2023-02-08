@@ -16,7 +16,7 @@
     $modulepath = $env:PSmodulepath.split(";")[1]
 
     $modules = @(
-    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1"
+    "https://raw.githubusercontent.com/Andreas6920/Other/main/modules/backup/upload.psm1"
     "https://raw.githubusercontent.com/Andreas6920/Other/main/Winoptimizer2.psm1"
     
     )   
