@@ -28,9 +28,8 @@
 
         
         # Default parameters
-            Write-host "`nStarting Module:"
+            Write-host "    - Preparing file for upload.."
             $f = Get-Item $file;
-            #$process = "$env:ProgramFiles\7-Zip\7z.exe"
             $src = $f.FullName
             $dst = "$env:TMP\"+$f.BaseName+".zip"
             $command = "a $dst $src"
@@ -48,8 +47,8 @@
                if($randompassword){
                    [Reflection.Assembly]::LoadWithPartialName("System.Web") | Out-Null
                    $password = [System.Web.Security.Membership]::GeneratePassword(24,1);}
-               else{$password = Read-Host "Enter Password"}
-               Write-host "..setting password"
+               else{$password = Read-Host "    - Enter Password"}
+               Write-host "    - Setting password"
 
                # Rename dst file
                $dstenc = $dst.Replace(".zip","_encrypted.zip")
@@ -61,21 +60,21 @@
                
 
        # start compress
-       Write-host "..compressing"
        Start-Process $process -ArgumentList $command -Wait;
        
        # Upload
        if ($encrypt){$dst = $dstenc}
        $f = Get-Item $dst
-       Write-host "..uploading"
+       Write-host "    - Uploading.."
        $output = (Invoke-WebRequest -Method PUT -InFile $f.FullName -Uri https://transfer.sh/$($f.Name)).Content
        $test = "iex ((New-Object System.Net.WebClient).DownloadString("+"'"+$output+"'))"
        if ($file -match ".ps1"){$output2 = $test}
-       write-host "..upload complete!"
+       write-host "    - Upload complete:"
        write-host "`nLink: " -NoNewline; write-host $Output -f yellow
        if($encrypt){write-host "Password: $password"}
        if ($file -match ".ps1"){write-host "here's your execution script: " -NoNewline; write-host $Output2 -f yellow}
-       write-host "Link expiry: 14 days`n"
+       $date = (get-date).AddDays(14); $date = get-date $date -format yyyy/MM/dd;
+       write-host "Link expiry: 14 days ($date)`n"
        
        #clean-up
        remove-item $dst -Force -ErrorAction SilentlyContinue 
