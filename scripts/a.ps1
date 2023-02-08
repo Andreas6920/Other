@@ -34,38 +34,38 @@ function Install-Application {
     
     choco install $App -y | Out-Null}
         
-Write-host "`tInstalling apps:" -f green
+    Write-host "`tInstalling apps:" -f green
     Install-Application -Name "PowerShell Core" -App "powershell-core"
     Install-Application -Name "Windows Terminal" -App "microsoft-windows-terminal"
     Install-Application -Name "Libre Wolf" -App "librewolf"
-        write-host "`t`t`t- Downloading to settings" -f Yellow
-        $link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=1m8TZD7d9nc-Vkmv1PgyyXwUMuNgFrI3s"
-        $src = "$env:TMP\librewolfprofile.zip"
-        (New-Object net.webclient).Downloadfile($link, $src); Start-Sleep -s 2
-        write-host "`t`t`t- Building profile" -f Yellow
-        Start-Process "C:\Program Files\LibreWolf\librewolf.exe"
-        Start-Sleep -s 5
-        Stop-Process -name "librewolf"; Start-Sleep -s 3
-        $dst = (Get-ChildItem -Directory -Depth 0 -path "C:\Users\Username\AppData\Roaming\librewolf\Profiles" | Where name -like "*-default").FullName
-        Expand-Archive -Path $src -DestinationPath $dst -Force
+    write-host "`t`t`t- Downloading to settings" -f Yellow
+    $link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=1m8TZD7d9nc-Vkmv1PgyyXwUMuNgFrI3s"
+    $src = "$env:TMP\librewolfprofile.zip"
+    (New-Object net.webclient).Downloadfile($link, $src); Start-Sleep -s 2
+    write-host "`t`t`t- Building profile" -f Yellow
+    Start-Process "C:\Program Files\LibreWolf\librewolf.exe"
+    Start-Sleep -s 5
+    Stop-Process -name "librewolf"; Start-Sleep -s 3
+    $dst = (Get-ChildItem -Directory -Depth 0 -path "C:\Users\Username\AppData\Roaming\librewolf\Profiles" | Where name -like "*-default").FullName
+    Expand-Archive -Path $src -DestinationPath $dst -Force
     Install-Application -Name "ShareX" -App "sharex"
-        Stop-Process -Name sharex
-        write-host "`t`t`t- Importing settings" -f Yellow
-        $link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=13xOvgOXgOkdLuGG-JqQiVQla6Gz6Sria"
-        $src = "$env:TMP\sharexprofile.zip"
-        write-host "`t`t`t- Downloading to settings" -f Yellow
-        (New-Object net.webclient).Downloadfile($link, $src);
-        $dst = [Environment]::GetFolderPath("MyDocuments")
-        $dst = Join-path $dst -ChildPath "Sharex"
-        Expand-Archive -Path $src -DestinationPath $dst -Force
-        $sys = [Environment]::GetFolderPath("ProgramFilesX86"), [Environment]::GetFolderPath("ProgramFiles")
-        Start-Process (Get-ChildItem $sys -Depth 2 | Where {$_.name -eq "ShareX.exe"}).FullName
-    Install-Application -Name "7-Zip" -App "7zip"
-    Install-Application -Name "VLC" -App "vlc"
+    Stop-Process -Name sharex
+    write-host "`t`t`t- Importing settings" -f Yellow
+    $link = "https://drive.google.com/uc?export=download&confirm=uc-download-link&id=13xOvgOXgOkdLuGG-JqQiVQla6Gz6Sria"
+    $src = "$env:TMP\sharexprofile.zip"
+    write-host "`t`t`t- Downloading to settings" -f Yellow
+    (New-Object net.webclient).Downloadfile($link, $src);
+    $dst = [Environment]::GetFolderPath("MyDocuments")
+    $dst = Join-path $dst -ChildPath "Sharex"
+    Expand-Archive -Path $src -DestinationPath $dst -Force
+    $sys = [Environment]::GetFolderPath("ProgramFilesX86"), [Environment]::GetFolderPath("ProgramFiles")
+    Start-Process (Get-ChildItem $sys -Depth 2 | Where {$_.name -eq "ShareX.exe"}).FullName
     Install-Application -Name "Brave" -App "brave"
     Install-Application -Name "Google Chrome" -App "googlechrome" -ignorehash
+    Install-Application -Name "7-Zip" -App "7zip"
     Install-Application -Name "Notepad++" -App "notepadplusplus"
     Install-Application -Name "PuTTY" -App "putty"
+    Install-Application -Name "VLC" -App "vlc"
     Install-Application -Name "Visual Studio Code" -App "vscode"
     Install-Application -Name "Gimp" -App "gimp"
     Install-Application -Name "Spotify" -App "spotify"
