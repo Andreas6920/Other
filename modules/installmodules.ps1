@@ -22,7 +22,9 @@ Write-host "Loading" -NoNewline
 
 $modulepath = $env:PSmodulepath.split(";")[1]
 $modules = @(
-"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1")
+"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/upload.psm1"
+"https://raw.githubusercontent.com/Andreas6920/Other/main/modules/ip.psm1"
+)
 
 Foreach ($module in $modules) {
 # prepare folder
