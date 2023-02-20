@@ -1,4 +1,8 @@
-﻿do {
+﻿# Check for admin rights
+$admin_permissions_check = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+$admin_permissions_check = $admin_permissions_check.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if ($admin_permissions_check) {
+do {
     Write-Host "`tScripts:" -f Yellow;"";
     Write-Host "`t[1] - Zerotier"
     "";
@@ -13,4 +17,4 @@
     }
         
 }
-while ($option -ne 100 )
+while ($option -ne 100 )}
