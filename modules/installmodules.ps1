@@ -38,4 +38,4 @@ Foreach ($module in $modules) {
     else {write-host "!"}
 }
 
-write-host "Module installation complete!" -f Green
+write-host "Module installation complete!" -f Green }
