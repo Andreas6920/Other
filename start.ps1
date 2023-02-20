@@ -13,11 +13,9 @@
     Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
 
 # Menu starts
-
+Clear-Host
 do {
-    Write-Host "MENU"
-    Write-Host "Please select one of the following options:" -f Yellow
-    Write-Host "";"";
+    Write-Host "`tMENU" -f Yellow;"";
     Write-Host "`t[1] - Windows-Optimizer"
     Write-Host "`t[2] - Windows-Server-Automator"
     Write-Host "`t[3] - Modules"
@@ -25,19 +23,19 @@ do {
     "";
     Write-Host "`t[0] - Exit"
     Write-Host ""; Write-Host "";
-    Write-Host "Option: " -f Yellow -nonewline; ;
+    Write-Host "`tOption: " -f Yellow -nonewline; ;
     $option = Read-Host
     Switch ($option) { 
         0 {exit}
-        1 {Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1'))}
-        2 {Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1'))}
-        3 {Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1'))}
-        4 {}
+        1 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1'))}
+        2 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1'))}
+        3 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/installmodules.ps1'))}
+        4 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/scripts.ps1'))}
         Default {} 
     }
         
 }
-while ($option -ne 3 )
+while ($option -ne 4 )
 
 
 <#
