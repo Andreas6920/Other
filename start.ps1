@@ -1,5 +1,4 @@
 # Prepare    
-
     # Nuget
     $packageProviders = Get-PackageProvider | Select-Object name
     if(!($packageProviders.name -contains "nuget")){Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
@@ -13,7 +12,35 @@
     New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
     Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
 
-# install modules
+# Menu starts
+
+do {
+    Write-Host "MENU"
+    Write-Host "Please select one of the following options:" -f Yellow
+    Write-Host "";"";
+    Write-Host "`t[1] - Windows-Optimizer"
+    Write-Host "`t[2] - Windows-Server-Automator"
+    Write-Host "`t[3] - Modules"
+    Write-Host "`t[4] - Scripts"
+    "";
+    Write-Host "`t[0] - Exit"
+    Write-Host ""; Write-Host "";
+    Write-Host "Option: " -f Yellow -nonewline; ;
+    $option = Read-Host
+    Switch ($option) { 
+        0 {exit}
+        1 {Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1'))}
+        2 {Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1'))}
+        3 {Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1'))}
+        4 {}
+        Default {} 
+    }
+        
+}
+while ($option -ne 3 )
+
+
+<#
     $modulepath = $env:PSmodulepath.split(";")[1]
 
     $modules = @(
@@ -44,7 +71,9 @@
     }
 
     (get-module | where name -eq Winoptimizer2).ExportedCommands
-      
+
+#>
+
     
     <#
         - Start script customize windows
