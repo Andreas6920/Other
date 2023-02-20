@@ -9,6 +9,7 @@
     Switch ($option) { 
         0 {exit}
         1 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1'))}
+        
         Default {} 
     }
         
