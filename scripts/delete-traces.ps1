@@ -1,0 +1,125 @@
+﻿    
+    Write-host "`t`t- Deleting Documents.." -f yellow
+    start-job -Name "Personal documents deletion" -ScriptBlock {
+    # Personal folders   
+        Get-Childitem $env:userprofile | % {Get-ChildItem $_.FullName | remove-item -Recurse -Force -ea SilentlyContinue} | ? { ! $_.PSIsContainer }
+
+    # Recent files
+        Write-host "`t`t- Recent files.." -f yellow
+        Get-ChildItem "$env:APPDATA\Microsoft\Windows\Recent\*" -File -Force -Exclude "desktop.ini" | Remove-Item -Force -ea SilentlyContinue
+        Get-ChildItem "$env:APPDATA\Microsoft\Windows\Recent\CustomDestinations\*" -File -Force -Exclude "desktop.ini" | Remove-Item -Force -ea SilentlyContinue
+        Get-ChildItem "$env:APPDATA\Microsoft\Windows\Recent\AutomaticDestinations\*" -File -Force -Exclude "desktop.ini" | Remove-Item -Force -ea SilentlyContinue
+
+    # Temp folders
+        $UserCreationDate = get-date ((Get-Item $($env:USERPROFILE)).CreationTime); $UserCreationDate = $UserCreationDate.ToShortDateString()
+        (Get-ChildItem "c:\windows\temp\" -Recurse | ? {$UserCreationDate -notcontains $_.CreationTime.ToShortDateString()}).FullName | Remove-Item -Recurse -Force -ea SilentlyContinue
+        Remove-Item -path $($env:TMP) -Recurse -Force -ea SilentlyContinue
+
+    # Quick access
+        remove-item "$env:APPDATA\Microsoft\Windows\Recent\AutomaticDestinations\f01b4d95cf55d32a.automaticDestinations-ms" -Force -ea SilentlyContinue                             
+
+    # Taskbar
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesChanges -Value 3 -Type Dword -Force | Out-Null
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesRemovedChanges -Value 32 -Type Dword -Force | Out-Null
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesVersion -Value 3 -Type Dword -Force | Out-Null
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name Favorites -Value ([byte[]](0xFF)) -Force | Out-Null
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowCortanaButton -Type DWord -Value 0 | Out-Null
+        Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Search -Name SearchboxTaskbarMode -Value 0 -Type Dword | Out-Null
+        set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowTaskViewButton -Type DWord -Value 0 | Out-Null
+        Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Recurse -Force | Out-Null
+ 
+    # Startmenu
+        Write-host "`t`t- Startmenu.." -f yellow
+        $layoutFile = "$env:SystemRoot\StartMenuLayout.xml"
+        Remove-Item $layoutFile -Force -ea SilentlyContinue
+        Invoke-WebRequest -uri "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/StartMenuLayout.xml" -OutFile $layoutFile
+        $regAliases = @("HKLM", "HKCU")
+            foreach ($regAlias in $regAliases) {
+            $basePath = $regAlias + ":\Software\Policies\Microsoft\Windows"
+            $keyPath = $basePath + "\Explorer" 
+            IF (!(Test-Path -Path $keyPath)) {New-Item -Path $basePath -Name "Explorer" | Out-Null}
+            Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 1
+            Set-ItemProperty -Path $keyPath -Name "StartLayoutFile" -Value $layoutFile}
+        Stop-Process -name explorer
+    
+    } | Out-Null
+
+
+    # Browser cleaning
+    Write-host "`t`t- Deleting Browser data.." -f yellow
+    start-job -Name "Personal documents deletion" -ScriptBlock {
+
+            # Stop Processes
+                Get-Process | ? Name -match OneDrive | Stop-Process  -ErrorAction SilentlyContinue
+            
+            # Internet Explorer
+                Write-host "`t- Cleaning Internet Explorer.." -f yellow
+                    Stop-Process -Name "iexplore" -ErrorAction SilentlyContinue
+                    RunDll32.exe InetCpl.cpl, ClearMyTracksByProcess 1
+                    Remove-Item -path "$($env:USERPROFILE)\AppData\Local\Microsoft\Windows\Temporary Internet Files\*" -Recurse -Force -EA SilentlyContinue
+                    Remove-Item -path "$($env:USERPROFILE)\AppData\Local\Microsoft\Windows\INetCache\*" -Recurse -Force -EA SilentlyContinue 
+                    $IEKeys = @(	
+                        "HKCU:\Software\Microsoft\Internet Explorer\TypedURLs"
+                        "HKCU:\Software\Microsoft\Internet Explorer\TypedURLsTime"
+                        "HKCU:\Software\Microsoft\Internet Explorer\TabbedBrowsing\NewTabPage"
+                        "HKCU:\Software\Microsoft\Internet Explorer\Main\FeatureControl"
+                        "HKCU:\Software\Microsoft\Windows\CurrentVersion\Ext\Stats")
+                        foreach ($Key in $IEKeys) { if((Test-Path $Key)){remove-item $Key -Recurse -force -ea Ignore}}
+            
+            # Edge
+                If ((Test-Path "$($env:LOCALAPPDATA)\Microsoft\Edge")){
+                    Write-host "`t`t- Cleaning Microsoft Edge.." -f yellow
+                    Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
+                    get-childitem "$($env:LOCALAPPDATA)\Microsoft\Edge\User Data" | remove-item -Recurse -Force -ErrorAction SilentlyContinue}
+                        
+            # Google Chrome
+                If ((Test-Path "$($env:LOCALAPPDATA)\Google\Chrome")){
+                    Write-host "`t`t- Cleaning Chrome.." -f yellow
+                    Stop-Process -Name "chrome" -ErrorAction SilentlyContinue
+                    get-childitem "$($env:LOCALAPPDATA)\Google\Chrome\User Data" | remove-item -Recurse -Force -ErrorAction SilentlyContinue}
+            
+            # Brave
+                If ((Test-Path "$($env:LOCALAPPDATA)\BraveSoftware\Brave-Browser")){
+                    Write-host "`t`t- Cleaning Brave.." -f yellow
+                    Stop-Process -Name "brave" -ErrorAction SilentlyContinue
+                    get-childitem "$($env:LOCALAPPDATA)\BraveSoftware\Brave-Browser\User Data" | remove-item -Recurse -Force -ErrorAction SilentlyContinue}
+            
+            # Mozilla Firefox
+                If ((Test-Path "$($env:USERPROFILE)\Appdata\*\Mozilla")){
+                    Write-host "`t`t- Cleaning Firefox.." -f yellow
+                    Stop-Process -Name "firefox" -ErrorAction SilentlyContinue
+                    get-childitem "$($env:LOCALAPPDATA)\Mozilla\Firefox\Profiles\.*release" | remove-item -Recurse -Force -ErrorAction SilentlyContinue}
+    } | Out-Null
+            
+         
+    (Get-Job).Name | % {Wait-Job $_}
+           
+    
+    # Cleaning traces                 
+        Write-host "`tCleaning traces:" -f yellow
+    
+            # Cleanupdisk
+                Write-host "`t`t- Clean up disk.." -f yellow
+                Get-ChildItem -Path ‘HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches’ | New-ItemProperty -Name StateFlags001 -Value 2 -PropertyType DWORD | Out-Null
+                Start-Process -FilePath CleanMgr.exe -ArgumentList ‘/sagerun:1’ -WindowStyle Hidden -Wait
+                Get-Process -Name cleanmgr,dismhost -ea SilentlyContinue | Wait-Process -Timeout 900
+
+            # Clear eventlogs
+                Write-host "`t`t- Event Viewer.." -f yellow
+                Get-EventLog -LogName * | % { Clear-EventLog $_.Log }
+
+            # Delete restore points
+                Write-host "`t`t- Restore point.." -f yellow
+                vssadmin delete shadows /all | Out-Null
+                Get-EventLog -LogName * | % { Clear-EventLog $_.Log }
+            
+            # Delete console history
+                Write-host "`t`t- Clean up Console History.." -f yellow
+                clear-history
+                
+                get-childitem "$($env:APPDATA)\Microsoft\Windows\PowerShell\PSReadLine\*history*" | remove-item -Force -ErrorAction SilentlyContinue
+
+            
+            # Make deleted files untraceable
+                Write-host "`t`t- Make deleted files unretrievable.. (This step will take LONG time)" -f yellow
+                cipher /w:c:\
