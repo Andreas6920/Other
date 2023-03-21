@@ -102,8 +102,11 @@
         Remove-ChromiumCache -ProfilesPath "Google\Chrome\User Data" -ProcessName "chrome"
         
         # Firefox
-        Remove-GeckoCache -ProfilesPath "Mozilla\Firefox\Profiles" -ProcessName "Firefox"
+        Remove-GeckoCache -ProfilesPath "Mozilla\Firefox\Profiles" -ProcessName "firefox"
         
+        # Librewolf
+        Remove-GeckoCache -ProfilesPath "librewolf\Profiles" -ProcessName "librewolf"
+
         # Vivaldi
         Remove-ChromiumCache -ProfilesPath "Vivaldi\User Data" -ProcessName "vivaldi"
         
@@ -118,11 +121,10 @@
 
         # Opera GX
         Remove-ChromiumCache -ProfilesPath "Opera Software\Opera GX Stable" -ProcessName "opera"
+
+        # Chromium
+        Remove-ChromiumCache -ProfilesPath "Chromium\User Data" -ProcessName "chrome"
                 
-        # Librewolf
-        Remove-GeckoCache -ProfilesPath "librewolf\Profiles" -ProcessName "Librewolf"
-           
-    
     # Cleaning traces                 
     Write-host "`tCleaning traces:" -f yellow
     
@@ -137,6 +139,7 @@
         # Clear eventlogs
         Write-host "`t    - Event Viewer.." -f yellow
         Get-EventLog -LogName * | % { Clear-EventLog $_.Log }
+        Get-WinEvent -ListLog * | Where-Object { $PSItem.IsEnabled -eq $true -and $PSItem.RecordCount -gt 0 } | ForEach-Object -Process {[Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.ClearLog($PSItem.LogName)} 2> $null
 
         # Delete restore points
         Write-host "`t    - Restore point.." -f yellow
@@ -147,6 +150,8 @@
         Write-host "`t    - Clean up Console History.." -f yellow
         clear-history
         get-childitem "$($env:APPDATA)\Microsoft\Windows\PowerShell\PSReadLine\*history*" | remove-item -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Recurse -Force -Verbose -ErrorAction SilentlyContinue
+        Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\WordWheelQuery" -Recurse -Force -Verbose -ErrorAction SilentlyContinue
         
         # Make deleted files untraceable
         Write-host "`t    - Make deleted files unretrievable.. (This step will take LONG time)" -f yellow
