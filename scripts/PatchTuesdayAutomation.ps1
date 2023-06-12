@@ -24,11 +24,15 @@
         New-BurntToastNotification -Applogo $logo -Text "PatchTuesday installed", "System is updated."}
 
 # Set Schedule for next update
-    $Action   = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdatepath"
+    $link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/PatchTuesdayAutomation.ps1"
+    $path = join-path -Path $env:ProgramData -ChildPath (Split-Path $link -Leaf)
+    (New-Object net.webclient).Downloadfile("$link", "$path");
+
+    $Action   = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $path"
     $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable
     $Date   = New-ScheduledTaskTrigger -Once -At (Get-NextPatchtuesday).AddDays(1) 
     $AtLogon  = New-ScheduledTaskTrigger -AtLogOn
     $AtLogon.Delay = 'PT5M'
     $User     = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
 
-    Register-ScheduledTask -TaskName "Windows Update Check ($User)" -Action $Action -Settings $Settings -Trigger $Date,$AtLogon -User $User -RunLevel Highest –Force
+    Register-ScheduledTask -TaskName "PatchTuesday Check ($User)" -Action $Action -Settings $Settings -Trigger $Date,$AtLogon -User $User -RunLevel Highest –Force
