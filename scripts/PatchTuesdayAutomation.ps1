@@ -104,6 +104,3 @@
 
     Register-ScheduledTask -TaskName "Update - PatchTuesday Check" -Action $Action -Settings $Settings -Trigger $Date -User $User -RunLevel Highest -Force
 
-
-
-    
