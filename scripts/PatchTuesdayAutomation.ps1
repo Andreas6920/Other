@@ -93,12 +93,16 @@
     $path = join-path -Path $env:ProgramData -ChildPath (split-path $link -Leaf)
     (New-Object net.webclient).Downloadfile("$link", "$path");
     do{sleep -s 1}until((Test-Path $path) -eq $true)
-
+    $day = Get-Date (Get-NextPatchTuesday).AddDays(1) -Hour 09
+    
     # Create a scheduled task called "Update - PatchTuesday Check"
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $path"
-    $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable
-    $Date = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek wednesday -At 10am
+    $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 5)
+    $Date = New-ScheduledTaskTrigger -Once -At $day
     $User = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
 
     Register-ScheduledTask -TaskName "Update - PatchTuesday Check" -Action $Action -Settings $Settings -Trigger $Date -User $User -RunLevel Highest -Force
 
+
+
+    
