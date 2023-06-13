@@ -90,9 +90,10 @@
 
     # Downloading this script to PC
     $link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/PatchTuesdayAutomation.ps1"
-    $path = join-path -Path $env:ProgramData -ChildPath (split-path $link -Leaf)
-    (New-Object net.webclient).Downloadfile("$link", "$path");
-    do{sleep -s 1}until((Test-Path $path) -eq $true)
+    $path = join-path -Path "$($env:ProgramData)\PatchTuesdayAutomation" -ChildPath (split-path $link -Leaf)
+        if(!(test-path $path)){mkdir (split-path $path) -Force | Out-Null -ErrorAction SilentlyContinue}
+        (New-Object net.webclient).Downloadfile("$link", "$path")
+        do{sleep -s 1}until((Test-Path $path) -eq $true)
     $day = Get-Date (Get-NextPatchTuesday).AddDays(1) -Hour 09
     
     # Create a scheduled task called "Update - PatchTuesday Check"
