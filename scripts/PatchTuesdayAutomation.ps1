@@ -1,38 +1,102 @@
 ﻿# Prepare system
     Set-executionpolicy -ExecutionPolicy Bypass -Scope Process -Force
-    $scripts = "https://raw.githubusercontent.com/tsrob50/Get-PatchTuesday/master/Get-PatchTuesday.ps1","https://paste.ee/r/7Kauc"
-    $scripts | %{ iwr -useb $_ | iex}
+    Function Get-PatchTuesday {
+          [CmdletBinding()]
+          Param
+          (
+            [Parameter(position = 0)]
+            [ValidateSet("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")]
+            [String]$weekDay = 'Tuesday',
+            [ValidateRange(0, 5)]
+            [Parameter(position = 1)]
+            [int]$findNthDay = 2
+          )
+          # Get the date and find the first day of the month
+          # Find the first instance of the given weekday
+          [datetime]$today = [datetime]::NOW
+          $todayM = $today.Month.ToString()
+          $todayY = $today.Year.ToString()
+          [datetime]$strtMonth = $todayM + '/1/' + $todayY
+          while ($strtMonth.DayofWeek -ine $weekDay ) { $strtMonth = $StrtMonth.AddDays(1) }
+          $firstWeekDay = $strtMonth
+
+          # Identify and calculate the day offset
+          if ($findNthDay -eq 1) {
+            $dayOffset = 0
+          }
+          else {
+            $dayOffset = ($findNthDay - 1) * 7
+          }
+  
+          # Return date of the day/instance specified
+          $patchTuesday = $firstWeekDay.AddDays($dayOffset) 
+          return $patchTuesday
+        }
+    Function Get-NextPatchTuesday {
+          [CmdletBinding()]
+          Param
+          (
+            [Parameter(position = 0)]
+            [ValidateSet("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")]
+            [String]$weekDay = 'Tuesday',
+            [ValidateRange(0, 5)]
+            [Parameter(position = 1)]
+            [int]$findNthDay = 2
+          )
+          # Get the date and find the first day of the month
+          # Find the first instance of the given weekday
+          $today = (get-date).AddMonths(1)
+          $todayM = $today.Month.ToString()
+          $todayY = $today.Year.ToString()
+          [datetime]$strtMonth = $todayM + '/1/' + $todayY
+          while ($strtMonth.DayofWeek -ine $weekDay ) { $strtMonth = $StrtMonth.AddDays(1) }
+          $firstWeekDay = $strtMonth
+
+          # Identify and calculate the day offset
+          if ($findNthDay -eq 1) {
+            $dayOffset = 0
+          }
+          else {
+            $dayOffset = ($findNthDay - 1) * 7
+          }
+  
+          # Return date of the day/instance specified
+          $patchTuesday = $firstWeekDay.AddDays($dayOffset) 
+          return $patchTuesday
+        }
+
 
 # IF patchtuesday was yesterday, update system
-    if ((get-date) -eq (Get-PatchTuesday).AddDays(1)){
+    $patchday = Get-Date (Get-PatchTuesday).AddDays(1) -Format "yyyy/MM/dd"
+    $today = Get-Date -Format "yyyy/MM/dd"    
+    if($today -eq $patchday){
 
-        # Update Notification MSG
+        # Windows Notification
         if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force}
         if(!(Get-module -name BurntToast)){Install-Module -Name BurntToast -Force}
-        $Logolink = "https://tinyurl.com/asdsad11111"
         $Logo = "$($env:TMP)\Coffee.gif"
-        (New-Object net.webclient).Downloadfile($logolink, $logo )
-        New-BurntToastNotification -Applogo $logo -Text "PatchTuesday was yesterday!", "Patching system now.."
-    
-        # Installing updates
-        Install-Module PSWindowsUpdate -Force
+        if(!(test-path $logo)){$Logolink = "https://tinyurl.com/asdsad11111"; (New-Object net.webclient).Downloadfile($logolink, $logo)}
+        New-BurntToastNotification -Applogo $logo -Text "PatchTuesday", ".. was yesterday!`nPatching system now.."
+
+        # Updating system
+        if(!(Get-module -name PSWindowsUpdate)){Install-Module PSWindowsUpdate -Force}
         Import-module PSWindowsUpdate
         Install-WindowsUpdate -Confirm:$False
                 
-        # Telling its done
-        (New-Object net.webclient).Downloadfile($logolink, $logo )
-        New-BurntToastNotification -Applogo $logo -Text "PatchTuesday installed", "System is updated."}
+        # Windows Notification
+        New-BurntToastNotification -Applogo $logo -Text "PatchTuesday", "Patching complete."}
 
-# Set Schedule for next update
+# Schedule patching for next Patchtuesday..
+
     $link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/PatchTuesdayAutomation.ps1"
-    $path = join-path -Path $env:ProgramData -ChildPath (Split-Path $link -Leaf)
+    $path = join-path -Path $env:ProgramData -ChildPath (split-path $link -Leaf)
     (New-Object net.webclient).Downloadfile("$link", "$path");
+    do{sleep -s 1}until((Test-Path $path) -eq $true)
 
-    $Action   = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $path"
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $path"
     $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable
-    $Date   = New-ScheduledTaskTrigger -Once -At (Get-NextPatchtuesday).AddDays(1) 
-    $AtLogon  = New-ScheduledTaskTrigger -AtLogOn
-    $AtLogon.Delay = 'PT5M'
-    $User     = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
+    $Date = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek wednesday -At 10am
+    $User = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
 
-    Register-ScheduledTask -TaskName "PatchTuesday Check ($User)" -Action $Action -Settings $Settings -Trigger $Date,$AtLogon -User $User -RunLevel Highest –Force
+    Register-ScheduledTask -TaskName "Update - PatchTuesday Check" -Action $Action -Settings $Settings -Trigger $Date -User $User -RunLevel Highest -Force
+
