@@ -92,7 +92,7 @@
     $link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/PatchTuesdayAutomation.ps1"
     $path = join-path -Path $env:ProgramData -ChildPath (split-path $link -Leaf)
     (New-Object net.webclient).Downloadfile("$link", "$path");
-    do{sleep -s 1}until((Test-Path $path) -eq $true
+    do{sleep -s 1}until((Test-Path $path) -eq $true)
 
     # Create a scheduled task called "Update - PatchTuesday Check"
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $path"
