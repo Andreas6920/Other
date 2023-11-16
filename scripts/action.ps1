@@ -1,4 +1,4 @@
-﻿$link = "https://app.action1.com/agent/6a1ea6b4-c507-11ed-bb7e-33120ead7e2e/Windows/agent(My_Organization).msi"
-$path = join-path -Path $env:TMP -ChildPath “action1_agent(My_Organization).msi”
+﻿$link = "https://app.eu.action1.com/agent/51fced32-7e39-11ee-b2da-3151362a23c3/Windows/agent(My_Organization).msi"
+$path = join-path -Path $env:TMP -ChildPath (split-path $link -Leaf)
 (New-Object net.webclient).Downloadfile("$link", "$path")
 msiexec /i $path /quiet
