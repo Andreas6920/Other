@@ -8,6 +8,7 @@ do {
     Write-Host "`t[2] - Delete traces"
     Write-Host "`t[3] - Download Windows"
     Write-Host "`t[4] - Action1"
+    Write-Host "`t[5] - Microsoft Activator"
     "";
     Write-Host "`t[0] - Exit"
     Write-Host ""; Write-Host "";
@@ -19,6 +20,7 @@ do {
         2 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1'))}
         3 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1'))}
         4 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/action.ps1'))}
+        5 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/microsoft-activator.ps1'))}
         Default {} 
     }
         
