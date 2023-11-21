@@ -8,3 +8,5 @@ $path = join-path -Path $env:TMP -ChildPath (split-path $link -Leaf)
 
 #msiexec /i $path /quiet
 msiexec /i $path
+
+do{Start-Sleep -S 1}until(get-service -Name "Action1 Agent") msg * "Agenten kører!"
