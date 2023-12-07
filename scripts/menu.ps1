@@ -6,7 +6,8 @@
     powershell -ep bypass $destination
 
 # Setup Menu Requirements
-
+    $rootpath = [Environment]::GetFolderPath("CommonApplicationData")
+    $applicationpath = Join-path -Path $rootpath -Childpath "WinOptimizer"
     
 
 # Start Menu
