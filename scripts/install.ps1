@@ -1,6 +1,6 @@
 #Install
     # Initialize installation
-        Clear-Host
+        #Clear-Host
         Write-host "Installing.."
     # TLS upgrade
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -28,7 +28,7 @@
         # Install module
             if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; Write-host "`t- Loading functions..";}
     # End
-        Clear-Host
+        #Clear-Host
 
 
 

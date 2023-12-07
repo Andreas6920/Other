@@ -2,7 +2,7 @@
     $Link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1"
     $Destination = "$env:TMP\WinOptimizerInstall.ps1"
     Invoke-WebRequest -uri $Link -OutFile $destination  -UseBasicParsing;
-    Clear-Host
+    #Clear-Host
     powershell -ep bypass $destination
 
 # Setup Menu Requirements
@@ -41,7 +41,7 @@
 # Start Menu
 
     Set-Location $rootpath
-    Clear-Host
+    #Clear-Host
     Write-host "`n`nWINOPTIMIZER`n" -f yellow
     Start-Menu -Name "win_antibloat" -Number "1" -Rename "Clean Windows"
     Start-Menu -Name "win_security" -Number "2" -Rename "Secure Windows"
