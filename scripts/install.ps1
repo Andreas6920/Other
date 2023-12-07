@@ -1,3 +1,38 @@
+#Install
+    # Initialize installation
+        Clear-Host
+        Write-host "Installing.."
+    # TLS upgrade
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    # Disable Explorer first run
+        $RegistryKey = "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main"
+        If (!(Test-Path $RegistryKey)) {New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+        $RegistryKey = Join-path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -ChildPath "DisableFirstRunCustomize"
+        If (!(Test-Path $RegistryKey)) {Write-host "`t- Disable First Run Internet Explorer.."; Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 1}
+    # Nuget
+        #$ProgressPreference = "SilentlyContinue" # hide progressbar
+        #$packageProviders = Get-PackageProvider | Select-Object name
+        #if(!($packageProviders.name -contains "nuget")){Write-host "`t- Installing Nuget.."; Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
+        #if($packageProviders -contains "nuget"){Write-host "`t- Importing Nuget..";Import-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
+        #$ProgressPreference = "Continue" #unhide progressbar
+    # Install functions
+        $modulepath = $env:PSmodulepath.split(";")[1]
+        $module = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/functions.psm1"
+        $file = (split-path $module -Leaf)
+        $filename = $file.Replace(".psm1","").Replace(".ps1","").Replace(".psd","")
+        $filedestination = "$modulepath/$filename/$file"
+        $filesubfolder = split-path $filedestination -Parent
+        If (!(Test-Path $filesubfolder )) {New-Item -ItemType Directory -Path $filesubfolder -Force | Out-Null; Start-Sleep -S 1}
+        # Download module
+            (New-Object net.webclient).Downloadfile($module, $filedestination)
+        # Install module
+            if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; Write-host "`t- Loading functions..";}
+    # End
+        Clear-Host
+
+
+
+
 # functions
 Function Restart-Explorer{
     <# When explorer restarts with the regular stop-process function, the active PowerShell loses focus,

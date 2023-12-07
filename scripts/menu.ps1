@@ -1,13 +1,41 @@
-﻿$rootpath = [Environment]::GetFolderPath("CommonApplicationData")
-$applicationpath = Join-path -Path $path -Childpath "winoptimizer"
-if(!(test-path $applicationpath)){
-        New-Item -ItemType Directory -Path $rootpath -Force | Out-Null
-        $link = "https://transfer.sh/HhwU0mirj6/install.ps1"
-        $path = join-path -Path $rootpath -ChildPath (split-path $link -Leaf)
-        (New-Object net.webclient).Downloadfile("$link", "$path");
-        Powershell -ep bypass $path
-        }
+﻿# Setup Requirements
+    $Link = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"
+    $Destination = "$env:TMP\WinOptimizerInstall.ps1"
+    Invoke-WebRequest -uri $Link -OutFile $destination  -UseBasicParsing;
+    Clear-Host
+    powershell -ep bypass $destination
 
+# Setup Menu Requirements
+
+    # Create Folder
+        Write-host "Loading" -nonewline
+        $rootpath = [Environment]::GetFolderPath("CommonApplicationData")
+        $applicationpath = Join-path -Path $rootpath -Childpath "WinOptimizer"
+
+        if(!(Test-Path $applicationpath)){Write-host "."; New-Item -ItemType Directory -Path $applicationpath -Force | Out-Null}
+
+    # Download Scripts
+        $scripts = @(
+        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_antibloat.ps1"
+        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_security.ps1"
+        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_settings.ps1")
+
+        Foreach ($script in $scripts) {
+
+        # Download Missing Files
+            $filename = split-path $script -Leaf
+            $filedestination = join-path $rootpath -Childpath $filename
+            (New-Object net.webclient).Downloadfile("$script", "$filedestination")
+
+    #Creating Missing Regpath
+        $reg_install = "HKLM:\Software\WinOptimizer"
+        If(!(Test-Path $reg_install)) {
+            Write-host ".";
+            New-Item -Path $reg_install -Force | Out-Null;}
+
+    #Creating Missing Regkeys
+        if (!((Get-Item -Path $reg_install).Property -match $filename)){
+            Set-ItemProperty -Path $reg_install -Name $filename -Type String -Value 0}}
 
 
 Set-Location $rootpath
