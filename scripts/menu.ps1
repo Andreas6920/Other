@@ -40,7 +40,7 @@
 
 # Start Menu
 
-    Set-Location $rootpath
+    Set-Location $applicationpath
     #Clear-Host
     Write-host "`n`nWINOPTIMIZER`n" -f yellow
     Start-Menu -Name "win_antibloat" -Number "1" -Rename "Clean Windows"
