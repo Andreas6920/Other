@@ -28,7 +28,7 @@
         # Install module
             if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; Write-host "`t- Loading functions..";}
     # End
-        #Clear-Host
+        Clear-Host
 
 
 
