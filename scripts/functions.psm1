@@ -79,6 +79,7 @@ Set-ItemProperty -Path $path -Name $name -Type $type -Value $value -Force | Out-
 }
 
 
+<#  
 function Install-App {
     param ( [Parameter(Mandatory=$true)]
         [string]$Name)
@@ -95,7 +96,7 @@ Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name 
     $name.split(",").Trim() | ForEach-Object { add-content -value $_ -path $applist}
     $powershellfile = "$folder\app-installer.ps1" 
     New-Item -Path $powershellfile -Force | Out-Null
-    
+
 # Add Chocolatey installation script to file
 If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
 New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
@@ -166,7 +167,7 @@ foreach ($requested_app in $requested_apps) {
 
 
 }
-
+#>
 
 <#
 # Prepare
