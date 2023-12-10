@@ -47,8 +47,9 @@ Creator: Andreas6920 | https://github.com/Andreas6920/
             0 { exit }
             1 { }
             2 { .\win_antibloat.ps1; Add-Hash -Name "win_antibloat.ps1"; .\menu.ps1; }
-            3 {  }
-            4 {  }
+            3 { .\win_security.ps1; Add-Hash -Name "win_security.ps1"; .\menu.ps1; }
+            4 { .\win_settings.ps1; Add-Hash -Name "win_settings.ps1"; .\menu.ps1; }
             5 {  }
             Default { } 
         }
+2
