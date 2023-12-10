@@ -79,15 +79,15 @@ Set-ItemProperty -Path $path -Name $name -Type $type -Value $value -Force | Out-
 }
 
 
-<#  
+
 function Install-App {
     param ( [Parameter(Mandatory=$true)]
         [string]$Name)
 
 # Disable Explorer first run
-If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
-New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
-Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
+    If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
+    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+    Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
 
 #Create folders and files
     $folder = Join-Path $env:temp -ChildPath "app-installer"
@@ -98,17 +98,17 @@ Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name 
     New-Item -Path $powershellfile -Force | Out-Null
 
 # Add Chocolatey installation script to file
-If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
-New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
-Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
-If (!(Test-Path "$env:ProgramData\Chocolatey")) {
-$WebResponse = Invoke-WebRequest -Uri "https://chocolatey.org/install"
-$chococode = ($WebResponse.AllElements | ? {$_.Class -eq "form-control text-bg-theme-elevation-1 user-select-all border-start-0 ps-1"}).Value
-if(!($chococode)){$chococode = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"}
-Add-Content -Encoding UTF8 -Value $chococode -Path $powershellfile}
+    If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
+    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+    Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
+    If (!(Test-Path "$env:ProgramData\Chocolatey")) {
+    $WebResponse = Invoke-WebRequest -Uri "https://chocolatey.org/install"
+    $chococode = ($WebResponse.AllElements | ? {$_.Class -eq "form-control text-bg-theme-elevation-1 user-select-all border-start-0 ps-1"}).Value
+    if(!($chococode)){$chococode = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"}
+    Add-Content -Encoding UTF8 -Value $chococode -Path $powershellfile}
 
 $requested_apps = get-content $applist
-foreach ($requested_app in $requested_apps) {
+    foreach ($requested_app in $requested_apps) {
     if("cancel" -eq "$requested_app"){Write-Output "Skipping this section.."}
     # Browsers
         elseif("Firefox" -match "$requested_app"){$header = "Mozilla Firefox"; $package = "firefox";} 
@@ -162,11 +162,13 @@ foreach ($requested_app in $requested_apps) {
     # Add entries to installer file
     Add-content -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.txt").Content.replace('REPLACE-ME-NAME', $header).replace('REPLACE-ME-APP', $package) -Path $powershellfile}
     
-    # Execute installer file
-   # Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:TMP)\app-installer\app-installer.ps1""`""
+   # Execute installer file
+   Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:TMP)\app-installer\app-installer.ps1""`""
 
 
 }
+
+<#  
 
 # Prepare
 Write-host "Loading" -NoNewline
