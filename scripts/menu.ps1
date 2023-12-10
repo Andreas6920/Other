@@ -1,6 +1,5 @@
 ﻿# Setup Requirements
     Clear-Host
-    Write-Host "Installing.."
     $Link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1"
     $Destination = "$env:TMP\WinOptimizerInstall.ps1"
     Invoke-WebRequest -uri $Link -OutFile $destination -UseBasicParsing;
