@@ -4,9 +4,8 @@
 
     # Disable Explorer first run
         $RegistryKey = "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main"
-        If (!(Test-Path $RegistryKey)) {New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
-        $RegistryKey = Join-path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -ChildPath "DisableFirstRunCustomize"
-        If (!(Test-Path $RegistryKey)) {Write-host "`t- Disable First Run Internet Explorer.."; Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 1}
+            If (!(Test-Path $RegistryKey)) {New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+            if(!(Get-Item "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main\" | ? Property -EQ "DisableFirstRunCustomize")){Write-host "`t- Disable First Run Internet Explorer.."; Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 1}
     
     # Nuget
         #$ProgressPreference = "SilentlyContinue" # hide progressbar
