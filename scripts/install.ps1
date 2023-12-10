@@ -29,7 +29,6 @@
             if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; Write-host "`t- Loading functions..";}
     
     # Create Folder
-        Write-host "Installing menu.."
         $rootpath = [Environment]::GetFolderPath("CommonApplicationData")
         $applicationpath = Join-path -Path $rootpath -Childpath "WinOptimizer"
         if(!(Test-Path $applicationpath)){Write-host "`t- Creating folder.."; New-Item -ItemType Directory -Path $applicationpath -Force | Out-Null}
@@ -39,7 +38,6 @@
         "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_antibloat.ps1"
         "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_security.ps1"
         "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_settings.ps1")
-        Write-host "`t- Loading system.."
         Foreach ($script in $scripts) {
 
         # Download Scripts
