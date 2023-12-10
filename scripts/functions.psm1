@@ -162,10 +162,10 @@ foreach ($requested_app in $requested_apps) {
     Add-content -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.txt").Content.replace('REPLACE-ME-NAME', $header).replace('REPLACE-ME-APP', $package) -Path $powershellfile}
     
     # Execute installer file
-    Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:TMP)\app-installer\app-installer.ps1""`""
+   # Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:TMP)\app-installer\app-installer.ps1""`""
 
 
-
+}
 
 
 <#
