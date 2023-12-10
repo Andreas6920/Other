@@ -26,7 +26,7 @@
         # Download module
             (New-Object net.webclient).Downloadfile($module, $filedestination)
         # Install module
-            if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; Write-host "`t- Loading functions..";}
+            if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; }
     
     # Create Folder
         $rootpath = [Environment]::GetFolderPath("CommonApplicationData")
