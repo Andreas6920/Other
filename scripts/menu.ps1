@@ -1,5 +1,5 @@
 ﻿# Setup Requirements
-    Clear-Host
+    #Clear-Host
     $Link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1"
     $Destination = "$env:TMP\WinOptimizerInstall.ps1"
     Invoke-WebRequest -uri $Link -OutFile $destination -UseBasicParsing;
@@ -31,7 +31,7 @@ Creator: Andreas6920 | https://github.com/Andreas6920/
 # Start Menu
 
     Set-Location $applicationpath
-    Clear-Host
+    #Clear-Host
     Write-Host $intro -f Yellow 
     Write-Host "`t[1] - All"
     Start-Menu -Name "win_antibloat" -Number "2" -Rename "Clean Windows"

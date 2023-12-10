@@ -52,7 +52,7 @@
             if (!((Get-Item -Path $reg_install).Property -match $filename)){Set-ItemProperty -Path $reg_install -Name $filename -Type String -Value 0}}
     
     # End
-        Clear-Host
+        #Clear-Host
 
 
 
