@@ -167,9 +167,7 @@ foreach ($requested_app in $requested_apps) {
 
 
 }
-#>
 
-<#
 # Prepare
 Write-host "Loading" -NoNewline
 
