@@ -79,41 +79,45 @@ Set-ItemProperty -Path $path -Name $name -Type $type -Value $value -Force | Out-
 }
 
 function Install-App {
-    param ( [Parameter(Mandatory=$false)]
+    param (
+        [Parameter(Mandatory=$false)]
         [string]$Name,
         [Parameter(Mandatory=$false)]
-        [string]$EnableAutoupdate )
+        [switch]$EnableAutoupdate,
+        [Parameter(Mandatory=$false)]
+        [switch]$Default)
 
-    
+# Disable Explorer first run
+    $RegistryKey = "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main"
+    If (!(Test-Path $RegistryKey)) {New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
+    if(!(Get-Item "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main\" | ? Property -EQ "DisableFirstRunCustomize")){Write-Host "Preparing" -f Yellow; Write-host "`t- Disabling First Run Internet Explorer.."; Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 1}
 
 #Create folders and files
-    $folder = Join-Path $env:temp -ChildPath "app-installer"
-    $applist = "$folder\app-list.txt"
+    $folder = [Environment]::GetFolderPath("CommonApplicationData")
+    $folder = Join-path -Path $folder -Childpath "WinOptimizer\win_appinstaller"
+    $applist = "$folder\app_list.txt"
     New-Item -Path $applist -Force | Out-Null
-    $name.split(",").Trim() | ForEach-Object { add-content -value $_ -path $applist}
-    $powershellfile = "$folder\app-installer.ps1" 
-    New-Item -Path $powershellfile -Force | Out-Null
+    $appinstallerscript = "$folder\app_installerscript.ps1" 
+    New-Item -Path $appinstallerscript -Force | Out-Null
 
 # Add Chocolatey installation script to file
-    If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
-    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
-    Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
-    If (!(Test-Path "$env:ProgramData\Chocolatey")) {
+    #If (!(Test-Path "$env:ProgramData\Chocolatey")) {
+    if(!(get-command choco -ErrorAction SilentlyContinue)){        
     $WebResponse = Invoke-WebRequest -Uri "https://chocolatey.org/install"
     $chococode = ($WebResponse.AllElements | ? {$_.Class -eq "form-control text-bg-theme-elevation-1 user-select-all border-start-0 ps-1"}).Value
     if(!($chococode)){$chococode = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"}
-    Add-Content -Encoding UTF8 -Value $chococode -Path $powershellfile
     $refresh = 'if(!(get-command choco -ErrorAction SilentlyContinue)){Import-Module "$env:ProgramData\chocolatey\helpers\chocolateyInstaller.psm1"; Update-SessionEnvironment}'
-    Add-Content -Encoding UTF8 -Value $refresh -Path $powershellfile
-    
-    }
+    Add-Content -Encoding UTF8 -Value $chococode -Path $appinstallerscript
+    Add-Content -Encoding UTF8 -Value $refresh -Path $appinstallerscript}
 
-# Menu
-# Hvis der ikke er angivet navn, vis menu
-        
+# If 'Default' parameter is used, install default applications  
+    if($Default){ write-host "Default package chosen:`n`t- Chrome`n`t- VLC`n`t- 7-zip`n`t- Adobe"; $name = "Chrome, vlc, 7-zip, Adobe"}
+
+# If 'Name' parameter is NOT used, a user interface will be shown
         if(!$Name){
-
+        Clear-Host
         Write-Host "`n`tAPP INSTALLER" -f Yellow
+        Write-Host "`tList the desired applications, seperate them with comma.`n`tSyntax: Chrome, Adobe Reader, 7-zip, Notepad++" -f Gray
         Write-Host "`n"
         Write-Host "`t" -NoNewline
         Write-Host "BROWSERS                                            " -f DarkBlue -BackgroundColor Yellow
@@ -145,71 +149,90 @@ function Install-App {
         Write-Host "`tMicrosoft Teams`t`tZoom`t`t`t`tWebex"
         Write-Host "`tTwich`t`t`t`tUbisoft Connect"
         Write-Host "`n"
-        Write-Host "`t" -NoNewline
-        Write-Host "Use code 'default' to install:"
-        Write-Host "`tchrome, vlc, 7zip and adobe reader."
+        Write-Host "`tOPTION: " -f Yellow -nonewline; ;
+        $name = Read-Host
+        Clear-Host}
 
-
-
-        }
-
+# Converting 'Name' user input to app list        
+    $name.Split(",").Replace("+","").Replace("-","").Replace(";",",").Replace(" ","") | ForEach-Object { add-content -value $_ -path $applist}
     $requested_apps = get-content $applist
-        foreach ($requested_app in $requested_apps) {
-        if("cancel" -eq "$requested_app"){Write-Output "Skipping this section.."}
+    Write-host "Adding to queue:" -f Yellow
+
+# Converting app list to install script
+    foreach ($requested_app in $requested_apps) {
+        
+        # Cancel
+            if("cancel" -eq "$requested_app"){Write-Output "Skipping this section.."}
         # Browsers
-            elseif("Firefox" -match "$requested_app"){$header = "Mozilla Firefox"; $package = "firefox";} 
-            elseif("Chrome" -match "$requested_app"){$header = "Google Chrome"; $package = "googlechrome";} 
-            elseif("Brave" -match "$requested_app"){$header = "Brave Browser"; $package = "brave";} 
-            elseif("Opera" -match "$requested_app"){$header = "Opera"; $package = "opera";} 
-            elseif("Vivaldi" -match "$requested_app"){$header = "Libre wolf"; $package = "librewolf";}
-
+            elseif("firefox" -match "$requested_app"){$header = "Mozilla Firefox"; $package = "firefox"; Write-host "`t- $Header";} 
+            elseif("chrome" -match "$requested_app"){$header = "Google Chrome"; $package = "googlechrome"; Write-host "`t- $Header";} 
+            elseif("brave" -match "$requested_app"){$header = "Brave Browser"; $package = "brave"; Write-host "`t- $Header";} 
+            elseif("opera" -match "$requested_app"){$header = "Opera"; $package = "opera"; Write-host "`t- $Header";} 
+            elseif("vivaldi" -match "$requested_app"){$header = "Vivaldi"; $package = "vivaldi"; Write-host "`t- $Header";}
         # Tools
-            elseif("Dropbox" -match "$requested_app"){$header = "Dropbox"; $package = "dropbox";} 
-            elseif("Google Drive" -match "$requested_app"){$header = "Google Drive"; $package = "googledrive";} 
-            elseif("TeamViewer" -match "$requested_app"){$header = "TeamViewer"; $package = "teamviewer";} 
-            elseif("7-zip" -match "$requested_app"){$header = "7-Zip"; $package = "7Zip";} 
-            elseif("winrar" -match "$requested_app"){$header = "Winrar"; $package = "winrar";} 
-            elseif("Greenshot" -match "$requested_app"){$header = "Greenshot"; $package = "greenshot";} 
-            elseif("ShareX" -match "$requested_app"){$header = "ShareX"; $package = "sharex";} 
-            elseif("Gimp" -match "$requested_app"){$header = "Gimp"; $package = "gimp";} 
-            elseif("Adobe" -match "$requested_app"){$header = "Adobe Acrobat Reader"; $package = "adobereader";} 
+            elseif("dropbox" -match "$requested_app"){$header = "Dropbox"; $package = "dropbox"; Write-host "`t- $Header";} 
+            elseif("drive" -match "$requested_app"){$header = "Google Drive"; $package = "googledrive"; Write-host "`t- $Header";} 
+            elseif("teamviewer" -match "$requested_app"){$header = "TeamViewer"; $package = "teamviewer"; Write-host "`t- $Header";} 
+            elseif("7zip" -match "$requested_app"){$header = "7-Zip"; $package = "7Zip"; Write-host "`t- $Header";} 
+            elseif("winrar" -match "$requested_app"){$header = "Winrar"; $package = "winrar"; Write-host "`t- $Header";}
+            elseif("Greenshot" -match "$requested_app"){$header = "Greenshot"; $package = "greenshot"; Write-host "`t- $Header";}
+            elseif("sharex" -match "$requested_app"){$header = "ShareX"; $package = "sharex"; Write-host "`t- $Header";}
+            elseif("gimp" -match "$requested_app"){$header = "Gimp"; $package = "gimp"; Write-host "`t- $Header";}
+            elseif("adobe" -match "$requested_app"){$header = "Adobe Acrobat Reader"; $package = "adobereader"; Write-host "`t- $Header";}
         # Media Player
-            elseif("spotify" -match "$requested_app"){$header = "Spotify"; $package = "Spotify";}  
-            elseif("VLC" -match "$requested_app"){$header = "VLC"; $package = "VLC";}  
-            elseif("itunes" -match "$requested_app"){$header = "iTunes"; $package = "itunes";}  
-            elseif("Winamp" -match "$requested_app"){$header = "Winamp"; $package = "Winamp";}  
-            elseif("foobar2000" -match "$requested_app"){$header = "foobar2000"; $package = "foobar2000";}  
-            elseif("K-lite" -match "$requested_app"){$header = "K-lite"; $package = "k-litecodecpackfull";}  
-            elseif("MPC-HC" -match "$requested_app"){$header = "MPC-HC"; $package = "MPC-HC";}  
-            elseif("popcorn" -match "$requested_app"){$header = "Popcorntime"; $package = "popcorntime";}  
+            elseif("spotify" -match "$requested_app"){$header = "Spotify"; $package = "Spotify"; Write-host "`t- $Header";}
+            elseif("vlc" -match "$requested_app"){$header = "VLC"; $package = "VLC"; Write-host "`t- $Header";}
+            elseif("itunes" -match "$requested_app"){$header = "iTunes"; $package = "itunes"; Write-host "`t- $Header";}
+            elseif("Winamp" -match "$requested_app"){$header = "Winamp"; $package = "Winamp"; Write-host "`t- $Header";}
+            elseif("foobar2000" -match "$requested_app"){$header = "foobar2000"; $package = "foobar2000"; Write-host "`t- $Header";}
+            elseif("klite" -match "$requested_app"){$header = "K-lite"; $package = "k-litecodecpackfull"; Write-host "`t- $Header";}
+            elseif("mpchc" -match "$requested_app"){$header = "MPC-HC"; $package = "MPC-HC"; Write-host "`t- $Header";}
         # Development
-            elseif("notepad" -match "$requested_app"){$header = "Notepad++"; $package = "notepadplusplus";}  
-            elseif("vscode" -match "$requested_app"){$header = "Visual Studio Code"; $package = "vscode";}  
-            elseif("vim" -match "$requested_app"){$header = "vim"; $package = "vim";} 
-            elseif("putty" -match "$requested_app"){$header = "PuTTY"; $package = "putty";} 
-            elseif("superputty" -match "$requested_app"){$header = "SuperPutty"; $package = "superputty";} 
-            elseif("teraterm" -match "$requested_app"){$header = "Tera Term"; $package = "teraterm";} 
-            elseif("Filezilla" -match "$requested_app"){$header = "Filezilla"; $package = "filezilla";} 
-            elseif("WinSCP" -match "$requested_app"){$header = "WinSCP"; $package = "WinSCP";} 
-            elseif("mremoteng" -match "$requested_app"){$header = "MremoteNG"; $package = "mremoteng";} 
-            elseif("wireshark" -match "$requested_app"){$header = "Wireshark"; $package = "wireshark";} 
-            elseif("git" -match "$requested_app"){$header = "git"; $package = "git";}
-            elseif("PowershellCore" -match "$requested_app"){$header = "PowerShell Core"; $package = "powershell-core";}
-            elseif("Windows terminal" -match "$requested_app"){$header = "Windows terminal"; $package = "microsoft-windows-terminal";}
+            elseif("notepad" -match "$requested_app"){$header = "Notepad++"; $package = "notepadplusplus"; Write-host "`t- $Header";}
+            elseif("vscode" -match "$requested_app"){$header = "Visual Studio Code"; $package = "vscode"; Write-host "`t- $Header";}
+            elseif("vim" -match "$requested_app"){$header = "vim"; $package = "vim"; Write-host "`t- $Header";}
+            elseif("putty" -match "$requested_app"){$header = "PuTTY"; $package = "putty"; Write-host "`t- $Header";}
+            elseif("superputty" -match "$requested_app"){$header = "SuperPutty"; $package = "superputty"; Write-host "`t- $Header";}
+            elseif("teraterm" -match "$requested_app"){$header = "Tera Term"; $package = "teraterm"; Write-host "`t- $Header";}
+            elseif("filezilla" -match "$requested_app"){$header = "Filezilla"; $package = "filezilla"; Write-host "`t- $Header";}
+            elseif("winscp" -match "$requested_app"){$header = "WinSCP"; $package = "WinSCP"; Write-host "`t- $Header";}
+            elseif("mremoteng" -match "$requested_app"){$header = "MremoteNG"; $package = "mremoteng"; Write-host "`t- $Header";}
+            elseif("wireshark" -match "$requested_app"){$header = "Wireshark"; $package = "wireshark"; Write-host "`t- $Header";}
+            elseif("git" -match "$requested_app"){$header = "git"; $package = "git"; Write-host "`t- $Header";}
+            elseif("powershell" -match "$requested_app"){$header = "PowerShell Core"; $package = "powershell-core"; Write-host "`t- $Header";}
+            elseif("Windowsterminal" -match "$requested_app"){$header = "Windows terminal"; $package = "microsoft-windows-terminal"; Write-host "`t- $Header";}
         # Social
-            elseif("Microsoft Teams" -match "$requested_app"){$header = "Microsoft Teams"; $package = "microsoft-teams";} 
-            elseif("Zoom" -match "$requested_app"){$header = "Zoom"; $package = "zoom";} 
-            elseif("Webex" -match "$requested_app"){$header = "Webex"; $package = "webex";}
-            elseif("Twitch" -match "$requested_app"){$header = "Twitch"; $package = "twitch";}
-            elseif("Ubisoft Connect" -match "$requested_app"){$header = "Ubisoft Connect"; $package = "ubisoft-connect";}
+            elseif("teams" -match "$requested_app"){$header = "Microsoft Teams"; $package = "microsoft-teams"; Write-host "`t- $Header";} 
+            elseif("zoom" -match "$requested_app"){$header = "Zoom"; $package = "zoom"; Write-host "`t- $Header";}
+            elseif("webex" -match "$requested_app"){$header = "Webex"; $package = "webex"; Write-host "`t- $Header";}
+            elseif("twitch" -match "$requested_app"){$header = "Twitch"; $package = "twitch"; Write-host "`t- $Header";}
+            elseif("ubisoft" -match "$requested_app"){$header = "Ubisoft Connect"; $package = "ubisoft-connect";  Write-host "`t- $Header";}
+
+    # Add entries to template, insert template in installer script
+        Add-content -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.txt").Content.replace('REPLACE-ME-NAME', $header).replace('REPLACE-ME-APP', $package) -Path $appinstallerscript}
+
+   # Execute installer script
+        Write-Host "Starting installation script" -f Yellow
+        Start-Job -Name "Installation" -ScriptBlock  { Start-Process Powershell -argument "-Ep bypass -Windowstyle Hidden -file `"""C:\ProgramData\WinOptimizer\win_appinstaller\app_installerscript.ps1""`"" } | Out-Null
+        Write-Host "Installing applications. (This may take a while)" -f Yellow
+        Wait-Job -Name "Installation"  | Out-Null
+    
+    #Scheduling application updater service
+        if(!$Name){
+            Do {
+                Write-Host "Would you like to configure applications to Auto Update? (y/n)" -nonewline;
+                $appinstall = Read-Host " " 
+                Switch ($appinstall) { 
+                    Y {Write-Host "- Yes"; Install-AppUpdater;} 
+                    N {Write-Host "- NO";} } 
+                } 
+            While($Readhost -notin "y", "n")}
+        else{Install-AppUpdater;}
+        
+    # Operation complete 
+    Write-Host "Installation complete" -f Yellow
 
 
-    
-    # Add entries to installer file
-    Add-content -Value (invoke-webrequest "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/app-template.txt").Content.replace('REPLACE-ME-NAME', $header).replace('REPLACE-ME-APP', $package) -Path $powershellfile}
-    
-   # Execute installer file
-   Start-Process Powershell -argument "-Ep bypass -Windowstyle hidden -file `"""$($env:TMP)\app-installer\app-installer.ps1""`""
 }
 
 Function Install-AppUpdater {
