@@ -29,7 +29,7 @@ Function Start-Menu {
     if($reghash -eq "0"){$color = "White"}
     
     if($rename) {$name = $rename}
-    Write-Host "`t[$number] - $name" -ForegroundColor $color }
+    Write-Host "`t[$number] - $name" -ForegroundColor $color 
 
 
     param (
@@ -236,22 +236,21 @@ function Install-App {
 }
 
 Function Install-AppUpdater {
-    # Download script
-        $folder = [Environment]::GetFolderPath("CommonApplicationData")
-        $folder = Join-path -Path $folder -Childpath "WinOptimizer\win_appinstaller"
-        $appupdaterlink = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/scripts/app-updater.ps1"
-        $appupdaterscript = Invoke-RestMethod -uri $appupdatelink -UseBasicParsing
-        $appupdaterpath = "$folder\app-updater.ps1"
-        New-Item -Path $appupdaterpath -Force | Out-Null
-        Set-Content -Value $appupdaterscript -Path $appupdatepath
+# Download Script
+$appupdaterlink = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/scripts/app-updater.ps1"
+$appupdaterpath = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\win_appinstaller\app-updater.ps1"
+New-Item -Path $appupdaterpath -Force | Out-Null
+Invoke-WebRequest -uri $appupdaterlink -OutFile $appupdaterpath -UseBasicParsing
 
-    # Schedule job for script
-        $jobname = "WinOptimizer: Patching Desktop Applications"
-        $jobprincipal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType ServiceAccount -RunLevel Highest
-        $jobtrigger= New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
-        $jobaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdaterpath"
-        $jobsettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
-        Register-ScheduledTask -TaskName $jobname -Settings $jobsettings -Principal $jobprincipal -Action $jobaction -Trigger $jobtrigger -Force | Out-Null}
+# Setting Scheduled Task
+$Taskname = "Winoptimizer - Patching Desktop Applications"
+$Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdaterpath"
+$Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -AllowStartIfOnBatteries -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
+$Tasktrigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
+$User = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
+Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
+
+}
 
 <#  
 
@@ -276,3 +275,21 @@ Foreach ($module in $modules) {
 }
 #>
 
+
+
+
+
+# Download script
+$appupdaterlink = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/scripts/app-updater.ps1"
+$appupdaterpath = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\win_appinstaller\app-updater.ps1"
+New-Item -Path $appupdaterpath -Force | Out-Null
+Invoke-WebRequest -uri $appupdaterlink -OutFile $appupdaterpath -UseBasicParsing
+
+# Setup schedule task
+$Taskname = "Winoptimizer: Patching Desktop Applications"
+$jobtrigger= New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
+$Action   = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdaterpath"
+$Settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
+$User     = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
+
+Register-ScheduledTask -TaskName $Taskname -Action $Action -Settings $Settings -Trigger $jobtrigger -User $User -RunLevel Highest –Force
