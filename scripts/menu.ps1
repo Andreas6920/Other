@@ -5,10 +5,7 @@
 
     # Download Scripts
     $Links = @( "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1"
-                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/menu.ps1"
-                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_antibloat.ps1"
-                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_security.ps1"
-                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_settings.ps1")
+                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/menu.ps1")
     foreach ($Link in $Links) {Invoke-WebRequest -uri $Link -OutFile  (join-path -Path $Destination -ChildPath (split-path $link -Leaf))}
     
     # Install requirements
