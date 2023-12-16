@@ -45,7 +45,7 @@ Function Start-Menu {
                 [Parameter(Mandatory=$false)]
                 [string]$Rename)
 
-            $path = "C:\ProgramData\winoptimizer\$name.ps1"
+            $path Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\$name.ps1"
             $file = Split-Path $path -Leaf
             $filehash = (Get-FileHash $path).Hash
             $reg_install = "HKLM:\Software\winoptimizer"
@@ -56,9 +56,8 @@ Function Start-Menu {
             elseif($filehash -ne $reghash){$color = "White"}
             if($reghash -eq "0"){$color = "White"}
             
-            if($rename) {$name = $rename}
-            Write-Host "`t[$number] - $name" -ForegroundColor $color 
-
+            if($rename) {   Write-Host "`t[$number] - $rename" -ForegroundColor $color  }
+            else {          Write-Host "`t[$number] - $name" -ForegroundColor $color    }
 
             param (
                 [Parameter(Mandatory=$true)]
