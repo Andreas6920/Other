@@ -57,22 +57,15 @@ Function Start-Menu {
             $path = Join-Path -Path $Base -Childpath "$Name.ps1"
             $file = "$Name.ps1"
             $filehash = (Get-FileHash $path).Hash
-            write-host $filehash -f Yellow
             $reg_install = "HKLM:\Software\WinOptimizer"
             $reghash = (get-ItemProperty -Path $reg_install -Name $file).$file
-            
-            write-host $reghash -f green
 
             if($filehash -eq $reghash){$color = "Gray"}
             elseif($filehash -ne $reghash){$color = "White"}
             if($reghash -eq "0"){$color = "White"}
             
             if($rename) {   Write-Host "`t[$number] - $rename" -ForegroundColor $color  }
-            else {          Write-Host "`t[$number] - $name" -ForegroundColor $color    }
-
-            #Set-ItemProperty -Path $reg_install -Name $name -Type String -Value $filehash
-
-}
+            else {          Write-Host "`t[$number] - $name" -ForegroundColor $color    }}
             
 
 Function Start-Input{
