@@ -1,19 +1,21 @@
 ﻿# Setup Requirements
-    #Clear-Host
-    $Link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1"
-    $Destination = "$env:TMP\WinOptimizerInstall.ps1"
-    Invoke-WebRequest -uri $Link -OutFile $destination -UseBasicParsing;
-    powershell -ep bypass $destination
+    # Create folder
+    $Destination = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
+        if(!(test-path $Destination)){mkdir $Destination -ErrorAction SilentlyContinue | Out-Null }
 
-# Setup Menu Requirements
-    $rootpath = [Environment]::GetFolderPath("CommonApplicationData")
-    $applicationpath = Join-path -Path $rootpath -Childpath "WinOptimizer"
-    $Link = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/menu.ps1"
-    $Destination = join-path -Path $applicationpath -ChildPath (split-path $link -Leaf)
-    Invoke-WebRequest -uri $Link -OutFile $destination -UseBasicParsing;
-
+    # Download Scripts
+    $Links = @( "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1"
+                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/menu.ps1"
+                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_antibloat.ps1"
+                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_security.ps1"
+                "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_settings.ps1")
+    foreach ($Link in $Links) {Invoke-WebRequest -uri $Link -OutFile  (join-path -Path $Destination -ChildPath (split-path $link -Leaf))}
+    
+    # Install requirements
+    Import-Module $Destination\install.ps1
 
 # Banner, just to show off
+Clear-Host
 $intro = 
 "
  _       ___       ____        __  _           _                
@@ -30,7 +32,7 @@ Creator: Andreas6920 | https://github.com/Andreas6920/
 
 # Start Menu
 
-    Set-Location $applicationpath
+    Set-Location (Split-Path $Destination)
     #Clear-Host
     Write-Host $intro -f Yellow 
     Write-Host "`t[1] - All"
