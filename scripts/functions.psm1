@@ -237,19 +237,18 @@ function Install-App {
 
 Function Install-AppUpdater {
 # Download Script
-$appupdaterlink = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/scripts/app-updater.ps1"
-$appupdaterpath = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\win_appinstaller\app-updater.ps1"
-New-Item -Path $appupdaterpath -Force | Out-Null
-Invoke-WebRequest -uri $appupdaterlink -OutFile $appupdaterpath -UseBasicParsing
+    $appupdaterlink = "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/scripts/app-updater.ps1"
+    $appupdaterpath = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\win_appinstaller\app-updater.ps1"
+    New-Item -Path $appupdaterpath -Force | Out-Null
+    Invoke-WebRequest -uri $appupdaterlink -OutFile $appupdaterpath -UseBasicParsing
 
 # Setting Scheduled Task
-$Taskname = "Winoptimizer - Patching Desktop Applications"
-$Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdaterpath"
-$Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -AllowStartIfOnBatteries -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
-$Tasktrigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
-$User = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
-Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
-
+    $Taskname = "Winoptimizer - Patching Desktop Applications"
+    $Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdaterpath"
+    $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -AllowStartIfOnBatteries -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
+    $Tasktrigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
+    $User = If ($Args[0]) {$Args[0]} Else {[Environment]::UserName}
+    Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
 }
 
 <#  
