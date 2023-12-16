@@ -16,7 +16,7 @@
 
 # Banner, just to show off
 
-
+Start-WinOptimizerUI
 <#
 
 Clear-Host

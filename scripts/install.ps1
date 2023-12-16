@@ -11,8 +11,8 @@
         if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){Write-host "`t- Install Nuget"; Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null}
     
     # Create Base Folder
-        $Destination = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
-        if(!(test-path $Destination)){mkdir $Destination -ErrorAction SilentlyContinue | Out-Null }
+        $BaseFolder = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
+        if(!(test-path $BaseFolder)){mkdir $BaseFolder -ErrorAction SilentlyContinue | Out-Null }
 
     # Preparing Scripts
         $scripts = @(
@@ -23,7 +23,7 @@
 
         # Download Scripts
             $filename = split-path $script -Leaf
-            $filedestination = join-path $applicationpath -Childpath $filename
+            $filedestination = join-path $BaseFolder -Childpath $filename
             (New-Object net.webclient).Downloadfile("$script", "$filedestination")
             
         # Creating Missing Regpath
@@ -53,13 +53,16 @@ Function Start-Menu {
                 [Parameter(Mandatory=$false)]
                 [string]$Rename)
 
-            $path = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\$name.ps1"
-            $file = Split-Path $path -Leaf
+            $Base = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
+            $path = Join-Path -Path $Base -Childpath "$Name.ps1"
+            $file = "$Name.ps1"
             $filehash = (Get-FileHash $path).Hash
-            $reg_install = "HKLM:\Software\winoptimizer"
+            write-host $filehash -f Yellow
+            $reg_install = "HKLM:\Software\WinOptimizer"
             $reghash = (get-ItemProperty -Path $reg_install -Name $file).$file
+            Set-ItemProperty -Path $reg_install -Name $name -Type String -Value $filehash
+            write-host $reghash -f green
 
-            
             if($filehash -eq $reghash){$color = "Gray"}
             elseif($filehash -ne $reghash){$color = "White"}
             if($reghash -eq "0"){$color = "White"}
@@ -67,14 +70,8 @@ Function Start-Menu {
             if($rename) {   Write-Host "`t[$number] - $rename" -ForegroundColor $color  }
             else {          Write-Host "`t[$number] - $name" -ForegroundColor $color    }
 
-            param (
-                [Parameter(Mandatory=$true)]
-                [string]$Name)
-
-            $path = "C:\ProgramData\winoptimizer\$name"
-            $filehash = (Get-FileHash $path).Hash
-            $reg_install = "HKLM:\Software\winoptimizer"
-            Set-ItemProperty -Path $reg_install -Name $name -Type String -Value $filehash}
+}
+            
 
 Function Start-Input{
     $code = @"
@@ -278,7 +275,7 @@ Function Install-AppUpdater {
     Invoke-WebRequest -uri $appupdaterlink -OutFile $appupdaterpath -UseBasicParsing
 
 # Setting Scheduled Task
-    $Taskname = "Winoptimizer - Patching Desktop Applications"
+    $Taskname = "WinOptimizer - Patching Desktop Applications"
     $Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ep bypass -w hidden -file $appupdaterpath"
     $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -AllowStartIfOnBatteries -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
     $Tasktrigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
@@ -305,7 +302,7 @@ Creator: Andreas6920 | https://github.com/Andreas6920/
 
 # Start Menu
 
-    Set-Location (Split-Path $Destination)
+    Set-Location (Split-Path $BaseFolder)
     #Clear-Host
     Write-Host $intro -f Yellow 
     Write-Host "`t[1] - All"
