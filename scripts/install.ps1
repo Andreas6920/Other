@@ -8,7 +8,7 @@
             if(!(Get-Item "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main\" | ? Property -EQ "DisableFirstRunCustomize")){Write-host "`t- Disable First Run Internet Explorer.."; Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 1}
     
     # Nuget Installation
-        if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){Write-host "`t- Install Nuget"; $ProgressPreference = "SilentlyContinue"; Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null}
+        if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){$ProgressPreference = "SilentlyContinue"; Start-Sleep -S 1; Write-host "`t- Install Nuget";  Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null}
     
     # Create Base Folder
         $BaseFolder = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
