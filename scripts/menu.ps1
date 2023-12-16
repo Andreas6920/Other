@@ -1,4 +1,7 @@
 ﻿# Setup Requirements
+    
+    
+    
     # Create folder
     $Destination = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
         if(!(test-path $Destination)){mkdir $Destination -ErrorAction SilentlyContinue | Out-Null }
@@ -12,6 +15,10 @@
     Import-Module $Destination\install.ps1
 
 # Banner, just to show off
+
+
+<#
+
 Clear-Host
 $intro = 
 "
@@ -51,3 +58,4 @@ Creator: Andreas6920 | https://github.com/Andreas6920/
             5 {  }
             Default { } 
         }
+#>
