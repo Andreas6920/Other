@@ -53,7 +53,7 @@ Function Start-Menu {
                 [Parameter(Mandatory=$false)]
                 [string]$Rename)
 
-            $path Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\$name.ps1"
+            $path = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer\$name.ps1"
             $file = Split-Path $path -Leaf
             $filehash = (Get-FileHash $path).Hash
             $reg_install = "HKLM:\Software\winoptimizer"
@@ -287,7 +287,7 @@ Function Install-AppUpdater {
 }
 
 
-Function Start-WinoptimizerUI {
+Function Start-WinOptimizerUI {
 Clear-Host
 $intro = 
 "
