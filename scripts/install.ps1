@@ -7,23 +7,31 @@
             If (!(Test-Path $RegistryKey)) {New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
             if(!(Get-Item "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main\" | ? Property -EQ "DisableFirstRunCustomize")){Write-host "`t- Disable First Run Internet Explorer.."; Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 1}
     
-    # Nuget
-        if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){Write-host "`t`t- Install Nuget" -F DarkYellow; Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null}
+    # Nuget Installation
+        if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){Write-host "`t- Install Nuget"; Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null}
     
-    <# Install functions
-        $modulepath = $env:PSmodulepath.split(";")[1]
-        $module = "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/functions.psm1"
-        $file = (split-path $module -Leaf)
-        $filename = $file.Replace(".psm1","").Replace(".ps1","").Replace(".psd","")
-        $filedestination = "$modulepath/$filename/$file"
-        $filesubfolder = split-path $filedestination -Parent
-        If (!(Test-Path $filesubfolder )) {New-Item -ItemType Directory -Path $filesubfolder -Force | Out-Null; Start-Sleep -S 1}
-        # Download module
-            (New-Object net.webclient).Downloadfile($module, $filedestination)
-        # Install module
-            if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; }
-        #>
-    # functions
+    # Create Base Folder
+        $Destination = Join-path -Path ([Environment]::GetFolderPath("CommonApplicationData")) -Childpath "WinOptimizer"
+        if(!(test-path $Destination)){mkdir $Destination -ErrorAction SilentlyContinue | Out-Null }
+
+    # Preparing Scripts
+        $scripts = @(
+        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_antibloat.ps1"
+        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_security.ps1"
+        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_settings.ps1")
+        Foreach ($script in $scripts) {
+
+        # Download Scripts
+            $filename = split-path $script -Leaf
+            $filedestination = join-path $applicationpath -Childpath $filename
+            (New-Object net.webclient).Downloadfile("$script", "$filedestination")
+            
+        # Creating Missing Regpath
+            $reg_install = "HKLM:\Software\WinOptimizer"
+            If(!(Test-Path $reg_install)) {New-Item -Path $reg_install -Force | Out-Null;}
+
+        # Creating Missing Regkeys
+            if (!((Get-Item -Path $reg_install).Property -match $filename)){Set-ItemProperty -Path $reg_install -Name $filename -Type String -Value 0}}
 
 Function Restart-Explorer{
             <# When explorer restarts with the regular stop-process function, the active PowerShell loses focus,
@@ -278,57 +286,6 @@ Function Install-AppUpdater {
     Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
 }
 
-<#  
-
-# Prepare
-Write-Host "Loading" -NoNewline
-
-$modulepath = $env:PSmodulepath.split(";")[1]
-$modules = @("https://transfer.sh/JndsE30i5k/functions.psm1")
-
-Foreach ($module in $modules) {
-# prepare folder
-    $file = (split-path $module -Leaf)
-    $filename = $file.Replace(".psm1","").Replace(".ps1","").Replace(".psd","")
-    $filedestination = "$modulepath/$filename/$file"
-    $filesubfolder = split-path $filedestination -Parent
-    If (!(Test-Path $filesubfolder )) {New-Item -ItemType Directory -Path $filesubfolder -Force | Out-Null; Start-Sleep -S 1}
-# Download module
-    (New-Object net.webclient).Downloadfile($module, $filedestination)
-# Install module
-    if (Get-Module -ListAvailable -Name $filename){ Import-module -name $filename; Write-Host "." -NoNewline}
-    #else {Write-Host "!"}
-}
-#>
-
-
-    
-    # Create Folder
-        $rootpath = [Environment]::GetFolderPath("CommonApplicationData")
-        $applicationpath = Join-path -Path $rootpath -Childpath "WinOptimizer"
-        if(!(Test-Path $applicationpath)){Write-host "`t- Creating folder.."; New-Item -ItemType Directory -Path $applicationpath -Force | Out-Null}
-
-    # Download Scripts
-        $scripts = @(
-        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_antibloat.ps1"
-        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_security.ps1"
-        "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/win_settings.ps1")
-        Foreach ($script in $scripts) {
-
-        # Download Scripts
-            $filename = split-path $script -Leaf
-            $filedestination = join-path $applicationpath -Childpath $filename
-            (New-Object net.webclient).Downloadfile("$script", "$filedestination")
-            
-        # Creating Missing Regpath
-            $reg_install = "HKLM:\Software\WinOptimizer"
-            If(!(Test-Path $reg_install)) {New-Item -Path $reg_install -Force | Out-Null;}
-
-        # Creating Missing Regkeys
-            if (!((Get-Item -Path $reg_install).Property -match $filename)){Set-ItemProperty -Path $reg_install -Name $filename -Type String -Value 0}}
-    
-    # End
-        #Clear-Host
 
 
 
