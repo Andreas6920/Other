@@ -60,7 +60,7 @@ Function Start-Menu {
             write-host $filehash -f Yellow
             $reg_install = "HKLM:\Software\WinOptimizer"
             $reghash = (get-ItemProperty -Path $reg_install -Name $file).$file
-            Set-ItemProperty -Path $reg_install -Name $name -Type String -Value $filehash
+            
             write-host $reghash -f green
 
             if($filehash -eq $reghash){$color = "Gray"}
@@ -69,6 +69,8 @@ Function Start-Menu {
             
             if($rename) {   Write-Host "`t[$number] - $rename" -ForegroundColor $color  }
             else {          Write-Host "`t[$number] - $name" -ForegroundColor $color    }
+
+            #Set-ItemProperty -Path $reg_install -Name $name -Type String -Value $filehash
 
 }
             
