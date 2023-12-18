@@ -1,2 +1,0 @@
-﻿# UI
-    Invoke-WebRequest -uri "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/install.ps1" -OutFile "$env:TMP\Install.ps1"; Import-Module "$env:TMP\install.ps1"; Start-WinOptimizerUI
