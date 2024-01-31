@@ -10,6 +10,7 @@ do {
     Write-Host "`t[4] - Download Windows"
     Write-Host "`t[5] - Microsoft Activator"
     Write-Host "`t[6] - Deployment Script"
+    Write-Host "`t[7] - Download Microsoft Office 2016 Professional"
     "";
     Write-Host "`t[0] - Exit"
     Write-Host ""; Write-Host "";
@@ -24,6 +25,9 @@ do {
         4 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1'))}
         5 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/microsoft-activator.ps1'))}
         6 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/deploy-project/main/Deployment.ps1'))}
+        7 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-office.ps1'))}
+
+        
 
         Default {} 
     }
