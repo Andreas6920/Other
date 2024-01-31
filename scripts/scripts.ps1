@@ -26,9 +26,6 @@ do {
         5 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/microsoft-activator.ps1'))}
         6 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/deploy-project/main/Deployment.ps1'))}
         7 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-office.ps1'))}
-
-        
-
         Default {} 
     }
         
