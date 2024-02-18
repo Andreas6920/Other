@@ -1,9 +1,5 @@
-﻿Do {
-CLS
-Write-Host "Microsoft Office 2016 Professional" -f Yellow
-Write-Host "Danish or English? (y/n)" -nonewline;
-$Readhost = Read-Host " " 
-    Switch ($ReadHost) { 
-       danish {Start "https://officecdn.microsoft.com/db/492350F6-3A01-4F97-B9C0-C7C6DDF67D60/media/da-DK/HomeBusinessRetail.img";} 
-       english {Start "https://officecdn.microsoft.com/db/492350F6-3A01-4F97-B9C0-C7C6DDF67D60/media/en-US/HomeBusinessRetail.img";} 
-     } } While($Readhost -notin "danish", "english")
+﻿Set-ExecutionPolicy Bypass -Scope Process -Force; 
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; 
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'));
+"Microsoft.MicrosoftOfficeHub","Microsoft.Office.OneNote" | ForEach-Object { if (Get-AppxPackage | Where-Object Name -Like $_){Get-AppxPackage | Where-Object Name -Like $_ | Remove-AppxPackage; Start-Sleep -S 5}}
+choco install microsoft-office-deployment --params="'/Product:ProfessionalRetail /64bit /ProofingToolLanguage:da-dk,en-us'"
