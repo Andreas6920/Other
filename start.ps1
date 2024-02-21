@@ -14,6 +14,15 @@
     New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
     Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
 
+function Start-Script {
+    param (
+        [Parameter(Mandatory=$false)]
+        [string]$Link)
+
+Clear-Host
+$name = get-date -f "yyyyMMddHHmmss"
+Invoke-RestMethod -UseBasicParsing $link -OutFile "$env:TMP\$name.ps1"; Import-Module "$env:TMP\$name.ps1"}
+
 # Menu starts
 Clear-Host
 do {
@@ -29,7 +38,7 @@ do {
     $option = Read-Host
     Switch ($option) { 
         0 {exit}
-        1 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1'))}
+        1 {Start-Script -Name "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"}
         2 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1'))}
         3 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/installmodules.ps1'))}
         4 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/scripts.ps1'))}
@@ -37,4 +46,4 @@ do {
     }
         
 }
-while ($option -ne 4 )
+while ($option -ne 20 )
