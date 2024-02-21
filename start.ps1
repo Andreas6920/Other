@@ -38,7 +38,7 @@ do {
     $option = Read-Host
     Switch ($option) { 
         0 {exit}
-        1 {Start-Script -Name "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"}
+        1 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"}
         2 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1'))}
         3 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/modules/installmodules.ps1'))}
         4 {Clear-Host; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/scripts.ps1'))}
