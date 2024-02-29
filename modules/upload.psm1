@@ -8,7 +8,6 @@ function upload {
     [Parameter(Mandatory=$false)]
     [switch]$Randompassword)
     
-    
     # Prepare system
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $RegistryPath = "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main"
