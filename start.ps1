@@ -1,5 +1,6 @@
 # Prepare    
     # Nuget
+    Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
     $ProgressPreference = "SilentlyContinue" # hide progressbar
     $packageProviders = Get-PackageProvider | Select-Object name
     if(!($packageProviders.name -contains "nuget")){Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
