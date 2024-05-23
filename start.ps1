@@ -14,14 +14,56 @@
     New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
     Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
 
-function Start-Script {
-    param (
-        [Parameter(Mandatory=$false)]
-        [string]$Link)
-
-Clear-Host
-$name = get-date -f "yyyyMMddHHmmss"
-Invoke-RestMethod -UseBasicParsing $link -OutFile "$env:TMP\$name.ps1"; Import-Module "$env:TMP\$name.ps1"}
+    function Start-Script {
+        param (
+            [Parameter(Mandatory=$true)]
+            [string]$Link,
+            [Parameter(Mandatory=$false)]
+            [ValidateSet("Desktop", "Temp", "ProgramData", "Documents")]
+            [string]$Location,
+            [Parameter(Mandatory=$false)]
+            [ValidateSet("PowerShell", "Zip", "Bat", "vbs")]
+            [string]$FileType,
+            [Parameter(Mandatory=$false)]
+            [switch]$zip,
+            [Parameter(Mandatory=$false)]
+            [String]$ProgramName
+            
+            )
+    
+    Clear-Host
+    
+    $ParentDirectory = [Environment]::GetFolderPath("CommonApplicationData")
+        if($Location){
+            if($Location -eq "Desktop"){$ParentDirectory = [Environment]::GetFolderPath("Desktop")}
+            if($Location -eq "Temp"){$ParentDirectory = $env:TMP}
+            if($Location -eq "ProgramData"){$ParentDirectory = [Environment]::GetFolderPath("CommonApplicationData")}
+            if($Location -eq "Documents"){$ParentDirectory = [Environment]::GetFolderPath("MyDocuments")} }
+    
+    
+    write-host $ParentDirectory -ForegroundColor Yellow
+    
+    if($Link -like "*.ps1"){
+        Write-host "This is a PowerShell File"
+        $FileName = Split-Path $Link -Leaf
+        $FileLocation = Join-path -Path $ParentDirectory -ChildPath $Filename
+        Write-host $FileLocation -ForegroundColor Red}
+    
+    if($Link -like "*zip"){
+        Write-host "This is a Zip File"
+        $FileName = Split-Path $Link -Leaf
+        Write-host $FileName
+        $FileLocationTemp = Join-Path -Path $env:TMP -ChildPath $Filename
+        Write-host "Step 1: download $Filelocation -ForegroundColor Red"
+        Invoke-RestMethod -Uri $Link -OutFile $FileLocationTemp
+    
+        $FileLocation = Join-path -Path $ParentDirectory -Childpath $FileName.Replace(".zip","")
+    
+        Expand-Archive -Path $FileLocationTemp -DestinationPath $FileLocation -Force
+        
+        Script = (Get-ChildItem $FileLocation -Recurse | Where Name -Match $ProgramName ).FullName
+    
+    }
 
 # Menu starts
 Clear-Host
@@ -39,6 +81,8 @@ do {
     Write-Host "`t[10] - Action1, Project"
     Write-Host "`t[11] - Delete digital footprint"
     Write-Host "`t[12] - Install Zero Tier"
+    Write-Host "`t[13] - Nirsoft IP Scanner"
+    Write-Host "`t[14] - Driver Installer"
 
 
     "";
@@ -60,6 +104,9 @@ do {
         10 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/action.ps1"}
         11 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1"}
         12 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1"}
+        13 {Start-Script -Link "https://www.nirsoft.net/utils/wnetwatcher-x64.zip" -ProgramName "WNetWatcher.exe"}
+        14 {Start-Script -Link "https://www.nirsoft.net/utils/wnetwatcher-x64.zip" -ProgramName "WNetWatcher.exe"}
+
 
     }
 
