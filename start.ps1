@@ -41,28 +41,26 @@
             if($Location -eq "ProgramData"){$ParentDirectory = [Environment]::GetFolderPath("CommonApplicationData")}
             if($Location -eq "Documents"){$ParentDirectory = [Environment]::GetFolderPath("MyDocuments")} }
     
-    
-    write-host $ParentDirectory -ForegroundColor Yellow
-    
     if($Link -like "*.ps1"){
-        Write-host "This is a PowerShell File"
         $FileName = Split-Path $Link -Leaf
-        $FileLocation = Join-path -Path $ParentDirectory -ChildPath $Filename
-        Write-host $FileLocation -ForegroundColor Red}
+        $Script = Join-path -Path $ParentDirectory -ChildPath $FileName
+        Invoke-RestMethod -Uri $Link -OutFile $Script
+        & $Script
+        
+        }
     
     if($Link -like "*zip"){
-        Write-host "This is a Zip File"
         $FileName = Split-Path $Link -Leaf
-        Write-host $FileName
-        $FileLocationTemp = Join-Path -Path $env:TMP -ChildPath $Filename
-        Write-host "Step 1: download $Filelocation -ForegroundColor Red"
+        $FileLocationTemp = Join-Path -Path $env:TMP -ChildPath $FileName
         Invoke-RestMethod -Uri $Link -OutFile $FileLocationTemp
     
         $FileLocation = Join-path -Path $ParentDirectory -Childpath $FileName.Replace(".zip","")
-    
         Expand-Archive -Path $FileLocationTemp -DestinationPath $FileLocation -Force
         
-        Script = (Get-ChildItem $FileLocation -Recurse | Where Name -Match $ProgramName ).FullName
+        $Script = (Get-ChildItem $FileLocation -Recurse | Where Name -Match $ProgramName ).FullName
+        Start $script
+
+
     
     }}
 
@@ -70,20 +68,20 @@
 Clear-Host
 do {
     Write-Host "`tMENU" -f Yellow;"";
-    Write-Host "`t[1] - Module: Windows-Optimizer"
-    Write-Host "`t[2] - Module: Windows-Server-Automator"
-    Write-Host "`t[3] - Install Microsoft Office 2016 Professional Retail"
-    Write-Host "`t[4] - Download Windows"
-    Write-Host "`t[5] - Activate Microsoft Office"
-    Write-Host "`t[6] - Activate Windows"
-    Write-Host "`t[7] - Deployment Script"
-    Write-Host "`t[8] - Deployment Script, Project"
-    Write-Host "`t[9] - Printer Script, Project"
-    Write-Host "`t[10] - Action1, Project"
-    Write-Host "`t[11] - Delete digital footprint"
-    Write-Host "`t[12] - Install Zero Tier"
-    Write-Host "`t[13] - Nirsoft IP Scanner"
-    Write-Host "`t[14] - Driver Installer"
+    Write-Host "`t[1] `tModule: Windows-Optimizer"
+    Write-Host "`t[2] `tModule: Windows-Server-Automator"
+    Write-Host "`t[3] `tInstall Microsoft Office 2016 Professional Retail"
+    Write-Host "`t[4] `tDownload Windows"
+    Write-Host "`t[5] `tActivate Microsoft Office"
+    Write-Host "`t[6] `tActivate Windows"
+    Write-Host "`t[7] `tDeployment Script"
+    Write-Host "`t[8] `tDeployment Script, Project"
+    Write-Host "`t[9] `tPrinter Script, Project"
+    Write-Host "`t[10] `tAction1, Project"
+    Write-Host "`t[11] `tDelete digital footprint"
+    Write-Host "`t[12] `tInstall Zero Tier"
+    Write-Host "`t[13] `tNirsoft IP Scanner"
+    Write-Host "`t[14] `tDriver Installer"
 
 
     "";
