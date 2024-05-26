@@ -64,7 +64,7 @@
         
         Script = (Get-ChildItem $FileLocation -Recurse | Where Name -Match $ProgramName ).FullName
     
-    }
+    }}
 
 # Menu starts
 Clear-Host
@@ -107,12 +107,7 @@ do {
         12 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1"}
         13 {Start-Script -Link "https://www.nirsoft.net/utils/wnetwatcher-x64.zip" -ProgramName "WNetWatcher.exe"}
         14 {Start-Script -Link "https://sdi-tool.org/releases/SDI_R2309.zip" -ProgramName "SDI_x64_R2309.exe" -Location "Desktop"}
-SDI_x64_R2309.exe
-
-    }
-
-
-
-        Default {}     
+        
+        Default {}}
 }
-while ($option -ne 20 )
+while ($option -ne 14 )
