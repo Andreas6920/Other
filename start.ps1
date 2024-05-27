@@ -83,7 +83,7 @@ do {
     Write-Host "`t[13] `tNirsoft IP Scanner"
     Write-Host "`t[14] `tDriver Installer"
     Write-Host "`t[15] `tDump Chrome Passwords"
-
+    Write-Host "`t[16] `tDump Wifi Passwords"
 
     "";
     Write-Host "`t[0] - Exit"
@@ -107,6 +107,7 @@ do {
         13 {Start-Script -Link "https://www.nirsoft.net/utils/wnetwatcher-x64.zip" -ProgramName "WNetWatcher.exe"}
         14 {Start-Script -Link "https://sdi-tool.org/releases/SDI_R2309.zip" -ProgramName "SDI_x64_R2309.exe" -Location "Desktop"}
         15 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
+        16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
         
         Default {}}
 }
