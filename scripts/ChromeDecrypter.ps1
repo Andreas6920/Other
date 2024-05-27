@@ -13,3 +13,5 @@ Write-host "`t- Extracting"
 Start-Sleep -S 5
 Write-host "`t- Running.."
 &.\chrome_decrypt2024.exe
+
+write-host "Credits to: SabinFotograf"
