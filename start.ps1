@@ -109,7 +109,7 @@ do {
         14 {Start-Script -Link "https://sdi-tool.org/releases/SDI_R2309.zip" -ProgramName "SDI_x64_R2309.exe" -Location "Desktop"}
         15 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
-        12 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1"}
+        17 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1"}
 
         
         Default {}}
