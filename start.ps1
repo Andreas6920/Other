@@ -84,7 +84,7 @@ do {
     Write-Host "`t[14] `tDriver Installer"
     Write-Host "`t[15] `tDump Chrome Passwords"
     Write-Host "`t[16] `tDump Wifi Passwords"
-    Write-Host "`t[17] `tRemove Bitdefender"
+    Write-Host "`t[17] `tBitdefender Remover Tool"
 
     "";
     Write-Host "`t[0] - Exit"
