@@ -97,8 +97,8 @@ do {
         2 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1"}
         3 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/office-template.txt"}
         4 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1"}
-        5 {& ([ScriptBlock]::Create((Invoke-RestMethod https://massgrave.dev/get))) /Ohook }
-        6 {& ([ScriptBlock]::Create((Invoke-RestMethod https://massgrave.dev/get))) /HWID}
+        5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
+        6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
         7 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/deploy-project/main/Deployment.ps1"}
         8 {Write-host "Upcomming..."}
         9 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/print_project/main/print-script.ps1"}
