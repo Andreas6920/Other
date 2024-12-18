@@ -110,7 +110,6 @@ do {
         15 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
         17 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | iex}
-
         
         Default {}}
 }
