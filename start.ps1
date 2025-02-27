@@ -85,6 +85,7 @@ do {
     Write-Host "`t[15] `tDump Chrome Passwords"
     Write-Host "`t[16] `tDump Wifi Passwords"
     Write-Host "`t[17] `tBitdefender Remover Tool"
+    Write-Host "`t[18] `tPC info"
 
     "";
     Write-Host "`t[0] - Exit"
@@ -110,7 +111,8 @@ do {
         15 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
         17 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | iex}
+        18 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | iex}
         
         Default {}}
 }
-while ($option -ne 17 )
+while ($option -ne 18 )
