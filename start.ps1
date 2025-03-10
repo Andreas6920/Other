@@ -100,8 +100,8 @@ do {
         4 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1"}
         5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
         6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
-        7 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/deploy-project/main/Deployment.ps1"}
-        8 {Write-host "Upcomming..."}
+        7 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1"}
+        8 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deploy-project-part1.ps1"}
         9 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/print_project/main/print-script.ps1"}
         10 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/action.ps1"}
         11 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1"}
