@@ -1,7 +1,7 @@
 ﻿# Start
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
-#reinsure admin rights
+# Reinsure admin rights
     If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
     {$Script = $MyInvocation.MyCommand.Path
      Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy RemoteSigned", "-File `"$Script`""}
@@ -47,21 +47,3 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
         $ThisPCDescription.Description = $PCDescription
         $ThisPCDescription.put() | out-null
         Write-Host "[$(Get-LogDate)]`t- Computeren navngives ved genstart." -ForegroundColor Green
-
-# Install Action1
-Write-Host "[$(Get-LogDate)]`t- Opsætter Opdateringer:" -ForegroundColor Green
-    
-    # Download
-    Write-Host "[$(Get-LogDate)]`t        - Henter ned" -ForegroundColor Yellow
-    $link = "https://app.eu.action1.com/agent/51fced32-7e39-11ee-b2da-3151362a23c3/Windows/agent(My_Organization).msi"
-    $path = join-path -Path $env:TMP -ChildPath (split-path $link -Leaf)
-    (New-Object net.webclient).Downloadfile("$link", "$path") | Out-Null
-    
-    # Install
-    Write-Host "[$(Get-LogDate)]`t        - Opsætter" -ForegroundColor Yellow -NoNewline
-    msiexec /i $path /quiet
-    
-    # Confirming installation
-    do{Start-Sleep -S 1; Write-Host "." -NoNewline -ForegroundColor Yellow}until(get-service -Name "Action1 Agent" -ErrorAction SilentlyContinue)
-
-Write-Host "[$(Get-LogDate)]`t- Opsætning gennemført. Genstart din PC snarest." -ForegroundColor Green
