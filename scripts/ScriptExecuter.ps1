@@ -54,7 +54,7 @@
                     
                     # Start scriptet i separat proces med timeout
                     $proc = Start-Process -FilePath "powershell.exe" -ArgumentList "-File `"$($script.FullName)`"" -PassThru -NoNewWindow
-                    $timeout = 3600  # Timeout i sekunder (60 minutter)  # Timeout i sekunder
+                    $timeout = 3600  # Timeout i sekunder (60 minutter)
                     
                     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                     while ($proc.HasExited -eq $false -and $stopwatch.Elapsed.TotalSeconds -lt $timeout) {
