@@ -51,14 +51,29 @@
         foreach ($script in $scripts) {
             try {   $starttime = get-logdate
                     "[$starttime] Kører script: $($script.Name)" | Add-Content -Path $logfile
-
-                    # Kør Script               
-                    & $script.FullName
-                
-                    $endtime = get-logdate
-                    "[$endtime] Færdig med at køre script: $($script.Name)" | Add-Content -Path $logfile
-                
-                    Move-Item -Path $script.FullName -Destination "$archivesubpath/$($script.Name)" -Force
-                    "[$(get-logdate)] Script flyttet til: $(Resolve-Path $archivesubpath)" | Add-Content -Path $logfile}
-            catch { "[$(get-logdate)] Fejl ved kørsel af script: $($script.Name) - $_" | Add-Content -Path $logfile}}} 
+                    
+                    # Start scriptet i separat proces med timeout
+                    $proc = Start-Process -FilePath "powershell.exe" -ArgumentList "-File `"$($script.FullName)`"" -PassThru -NoNewWindow
+                    $timeout = 3600  # Timeout i sekunder (60 minutter)  # Timeout i sekunder
+                    
+                    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+                    while ($proc.HasExited -eq $false -and $stopwatch.Elapsed.TotalSeconds -lt $timeout) {
+                        Start-Sleep -Seconds 1
+                    }
+                    
+                    if ($proc.HasExited -eq $false) {
+                        Stop-Process -Id $proc.Id -Force
+                        "[$(get-logdate)] Script timeout: $($script.Name) blev tvunget til at stoppe" | Add-Content -Path $logfile
+                        Remove-Item -Path $script.FullName -Force
+                        "[$(get-logdate)] Script slettet: $($script.Name)" | Add-Content -Path $logfile
+                    } else {
+                        $endtime = get-logdate
+                        "[$endtime] Færdig med at køre script: $($script.Name)" | Add-Content -Path $logfile
+                        
+                        Move-Item -Path $script.FullName -Destination "$archivesubpath/$($script.Name)" -Force
+                        "[$(get-logdate)] Script flyttet til: $(Resolve-Path $archivesubpath)" | Add-Content -Path $logfile
+                    }
+            }
+            catch { "[$(get-logdate)] Fejl ved kørsel af script: $($script.Name) - $_" | Add-Content -Path $logfile}}
+    } 
     else { "[$(get-logdate)] Ingen scripts fundet i $(Resolve-Path $basepath)" | Add-Content -Path $logfile }
