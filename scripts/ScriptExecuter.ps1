@@ -21,7 +21,7 @@
 # ScriptExecuter opdatering
 
     # Hent online scriptets første linje (Tager højde for æ, ø, å)
-        try {   $onlinescript = [System.Text.Encoding]::UTF8.GetString((New-Object System.Net.WebClient).DownloadData($scripturl))
+        try {   $onlinescript = irm -Uri $scripturl
                 $onlinefirstline = ($onlinescript -split "`r?`n")[0]}
         catch { "[$(get-logdate)] Fejl ved hentning af script fra $scripturl - $_" | Add-Content -Path $logfile;}
 
@@ -32,8 +32,8 @@
     # Opdater scriptet, hvis online versionen er anderledes
         if ($onlinefirstline -ne $localfirstline) { 
             "[$(get-logdate)] Opdatering fundet:" | Add-Content -Path $logfile
-            "[$(get-logdate)] `tOnline version: $onlinefirstline" | Add-Content -Path $logfile
-            "[$(get-logdate)] `tLokal version: $localfirstline" | Add-Content -Path $logfile
+            "[$(get-logdate)]`t`tOnline version: $onlinefirstline" | Add-Content -Path $logfile
+            "[$(get-logdate)]`t`tLokal version: $localfirstline" | Add-Content -Path $logfile
             $onlinescript | Set-Content -Path $executefile -Encoding UTF8
             "[$(get-logdate)] Script opdateret fra online kilde" | Add-Content -Path $logfile}
 
