@@ -1,4 +1,3 @@
-
     # Opsætning
     $basepath = "C:/Script"
     $executepath = "$basepath/Execute"
