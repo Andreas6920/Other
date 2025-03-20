@@ -19,7 +19,7 @@
     foreach ($folder in $folders) {if (!(Test-Path $folder)) {New-Item -ItemType Directory -Path $folder -Force | Out-Null}}
 
 # ScriptExecuter opdatering
-
+<#
     # Hent online scriptets første linje (Tager højde for æ, ø, å)
         try     {   $onlinescript = irm -Uri $scripturl; $onlinefirstline = $script.Split("`n")[0]}
         catch   { "[$(get-logdate)] Fejl ved hentning af script fra $scripturl - $_" | Add-Content -Path $logfile;}
@@ -35,6 +35,7 @@
             "[$(get-logdate)]`t`tLokal version: $localfirstline" | Add-Content -Path $logfile
             $onlinescript | Set-Content -Path $executefile -Encoding UTF8
             "[$(get-logdate)] Script opdateret fra online kilde" | Add-Content -Path $logfile}
+#>
 
 # Kør Script
 
