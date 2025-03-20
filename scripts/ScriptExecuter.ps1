@@ -21,9 +21,8 @@
 # ScriptExecuter opdatering
 
     # Hent online scriptets første linje (Tager højde for æ, ø, å)
-        try {   $onlinescript = irm -Uri $scripturl
-                $onlinefirstline = ($onlinescript -split "`r?`n")[0]}
-        catch { "[$(get-logdate)] Fejl ved hentning af script fra $scripturl - $_" | Add-Content -Path $logfile;}
+        try     {   $onlinescript = irm -Uri $scripturl; $onlinefirstline = $script.Split("`n")[0]}
+        catch   { "[$(get-logdate)] Fejl ved hentning af script fra $scripturl - $_" | Add-Content -Path $logfile;}
 
     # Hent lokal scriptets første linje
         if (Test-Path $executefile) { $localfirstline = (Get-Content $executefile -First 1 -Encoding UTF8)}
