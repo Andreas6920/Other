@@ -1,5 +1,6 @@
-# Timestamps for actions
-Function Get-LogDate {return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]")}
+Function Get-LogDate {
+    return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]")
+}
 
 # URL til download-siden
 $url = "https://sdi-tool.org/download/"
@@ -12,8 +13,12 @@ if (!(Test-Path -Path $desktopPath)) {
     New-Item -ItemType Directory -Path $desktopPath | Out-Null
 }
 
+Write-Host "$(Get-LogDate)`t    Opretter mappe til download på skrivebordet..." -ForegroundColor Green
+
 # Hent HTML-indholdet med Invoke-RestMethod
 $response = Invoke-RestMethod -Uri $url -Method Get
+
+Write-Host "$(Get-LogDate)`t    Henter HTML-indhold fra: $url" -ForegroundColor Green
 
 # Konverter HTML-indholdet til tekst
 $content = $response | Out-String
@@ -24,37 +29,37 @@ $match = [regex]::Match($content, $linkPattern)
 
 if ($match.Success) {
     $zipUrl = $match.Value
-    Write-Output "Fundet download-link: $zipUrl"
+    Write-Host "$(Get-LogDate)`t    Fundet download-link: $zipUrl" -ForegroundColor Green
 
     # Definer stien hvor ZIP-filen skal downloades
     $zipFilePath = "$desktopPath\SDI_Tool.zip"
 
     # Download ZIP-filen
     Invoke-WebRequest -Uri $zipUrl -OutFile $zipFilePath
-    Write-Output "Filen blev downloadet til: $zipFilePath"
+    Write-Host "$(Get-LogDate)`t    Filen blev downloadet til: $zipFilePath" -ForegroundColor Green
 
     # Ekstraher ZIP-filen til skrivebordsmappen
     Expand-Archive -Path $zipFilePath -DestinationPath $desktopPath -Force
-    Write-Output "Filen er blevet udpakket til: $desktopPath"
+    Write-Host "$(Get-LogDate)`t    Filen er blevet udpakket til: $desktopPath" -ForegroundColor Green
 
     # Slet ZIP-filen efter udpakning
     Remove-Item -Path $zipFilePath
-    Write-Output "ZIP-filen er blevet slettet efter udpakning."
+    Write-Host "$(Get-LogDate)`t    ZIP-filen er blevet slettet efter udpakning." -ForegroundColor Green
 
     # Angiv sti til SDI_auto.bat filen
     $batFilePath = [System.IO.Path]::Combine($desktopPath, "SDI_auto.bat")
 
     # Tjek om SDI_auto.bat filen eksisterer
     if (Test-Path -Path $batFilePath) {
-        Write-Output "Starter SDI_auto.bat filen..."
+        Write-Host "$(Get-LogDate)`t    Starter SDI_auto.bat filen..." -ForegroundColor Green
 
         # Kør .bat filen
         Start-Process -FilePath $batFilePath -NoNewWindow -Wait
-        Write-Output "SDI_auto.bat filen er blevet kørt."
+        Write-Host "$(Get-LogDate)`t    SDI_auto.bat filen er blevet kørt." -ForegroundColor Green
     }
     else {
-        Write-Output "Filen SDI_auto.bat blev ikke fundet i mappen: $desktopPath"
-    }}
-
-# Hvis der ikke findes et gyldig link, skriv en besked
-else { Write-Output "Ingen gyldig link blev fundet på siden." }
+        Write-Host "$(Get-LogDate)`t    Filen SDI_auto.bat blev ikke fundet i mappen: $desktopPath" -ForegroundColor Green
+    }
+} else {
+    Write-Host "$(Get-LogDate)`t    Ingen gyldig link blev fundet på siden." -ForegroundColor Green
+}
