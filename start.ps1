@@ -1,11 +1,20 @@
 # Prepare    
-    # Nuget
+
+<#
+# Nuget
     Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
     $ProgressPreference = "SilentlyContinue" # hide progressbar
     $packageProviders = Get-PackageProvider | Select-Object name
     if(!($packageProviders.name -contains "nuget")){Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
     if($packageProviders -contains "nuget"){Import-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
     $ProgressPreference = "Continue" #unhide progressbar
+#>
+
+# Reinsure admin rights
+    If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+    {# Relaunch as an elevated process
+    $Script = $MyInvocation.MyCommand.Path
+    Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy RemoteSigned", "-File `"$Script`""}
 
 # TLS upgrade
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -86,7 +95,7 @@ do {
     Write-Host "`t[16] `tDump Wifi Passwords"
     Write-Host "`t[17] `tBitdefender Remover Tool"
     Write-Host "`t[18] `tPC info"
-    Write-Host "`t[19] `tSpotX"
+    Write-Host "`t[19] `tInstall SpotX"
 
     "";
     Write-Host "`t[0] - Exit"
@@ -117,4 +126,4 @@ do {
         
         Default {}}
 }
-while ($option -ne 18 )
+while ($option -ne 19 )
