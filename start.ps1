@@ -1,20 +1,11 @@
-# Prepare    
-
-<#
-# Nuget
-    Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-    $ProgressPreference = "SilentlyContinue" # hide progressbar
-    $packageProviders = Get-PackageProvider | Select-Object name
-    if(!($packageProviders.name -contains "nuget")){Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
-    if($packageProviders -contains "nuget"){Import-PackageProvider -Name NuGet -RequiredVersion 2.8.5.208 -Force -Scope CurrentUser | Out-Null}
-    $ProgressPreference = "Continue" #unhide progressbar
-#>
-
 # Ensure admin rights
     If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
     {# Relaunch as an elevated process
     $Script = $MyInvocation.MyCommand.Path
     Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy RemoteSigned", "-File `"$Script`""}
+
+# Execution policy
+    Set-ExecutionPolicy -Scope Process Unrestricted -Force
 
 # TLS upgrade
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -23,55 +14,6 @@
     If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
     New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
     Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
-
-    function Start-Script {
-        param (
-            [Parameter(Mandatory=$true)]
-            [string]$Link,
-            [Parameter(Mandatory=$false)]
-            [ValidateSet("Desktop", "Temp", "ProgramData", "Documents")]
-            [string]$Location,
-            [Parameter(Mandatory=$false)]
-            [ValidateSet("PowerShell", "Zip", "Bat", "vbs")]
-            [string]$FileType,
-            [Parameter(Mandatory=$false)]
-            [switch]$zip,
-            [Parameter(Mandatory=$false)]
-            [String]$ProgramName
-            
-            )
-    
-    Clear-Host
-    
-    $ParentDirectory = [Environment]::GetFolderPath("CommonApplicationData")
-        if($Location){
-            if($Location -eq "Desktop"){$ParentDirectory = [Environment]::GetFolderPath("Desktop")}
-            if($Location -eq "Temp"){$ParentDirectory = $env:TMP}
-            if($Location -eq "ProgramData"){$ParentDirectory = [Environment]::GetFolderPath("CommonApplicationData")}
-            if($Location -eq "Documents"){$ParentDirectory = [Environment]::GetFolderPath("MyDocuments")} }
-    
-    if($Link -like "*.ps1"){
-        $FileName = Split-Path $Link -Leaf
-        $Script = Join-path -Path $ParentDirectory -ChildPath $FileName
-        Invoke-RestMethod -Uri $Link -OutFile $Script
-        & $Script
-        
-        }
-    
-    if($Link -like "*zip"){
-        $FileName = Split-Path $Link -Leaf
-        $FileLocationTemp = Join-Path -Path $env:TMP -ChildPath $FileName
-        Invoke-RestMethod -Uri $Link -OutFile $FileLocationTemp
-    
-        $FileLocation = Join-path -Path $ParentDirectory -Childpath $FileName.Replace(".zip","")
-        Expand-Archive -Path $FileLocationTemp -DestinationPath $FileLocation -Force
-        
-        $Script = (Get-ChildItem $FileLocation -Recurse | Where Name -Match $ProgramName ).FullName
-        Start $script
-
-
-    
-    }}
 
 # Menu starts
 Clear-Host
@@ -106,7 +48,7 @@ do {
         0 {exit}
         1 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression}
         2 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression}
-        3 {<# Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/office-template.txt" | Invoke-Expression #>}
+        3 {irm "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | IEX; Install-App -Name Office}
         4 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1" | Invoke-Expression}
         5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
         6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
@@ -118,10 +60,10 @@ do {
         12 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1" | Invoke-Expression}
         13 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/WNetWatcher.ps1" | Invoke-Expression}
         14 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/SDI-Tool.ps1" | Invoke-Expression}
-        15 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
+        15 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"  | Invoke-Expression}
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
-        17 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | iex}
-        18 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | iex}
+        17 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | Invoke-Expression}
+        18 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | Invoke-Expression}
         19 {iex "& { $(iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/spotx-official.github.io/main/run.ps1') } -confirm_uninstall_ms_spoti -confirm_spoti_recomended_over -podcasts_off -block_update_on -start_spoti -new_theme -adsections_off -lyrics_stat spotify"}
         
         Default {}}
