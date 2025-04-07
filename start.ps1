@@ -117,7 +117,7 @@ do {
         11 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1"}
         12 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1"}
         13 {Start-Script -Link "https://www.nirsoft.net/utils/wnetwatcher-x64.zip" -ProgramName "WNetWatcher.exe"}
-        14 {Start-Script -Link "https://sdi-tool.org/releases/SDI_R2309.zip" -ProgramName "SDI_x64_R2309.exe" -Location "Desktop"}
+        14 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/SDI-Tool.ps1" | Invoke-Expression}
         15 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
         17 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | iex}
