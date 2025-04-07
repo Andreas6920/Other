@@ -86,6 +86,7 @@ do {
     Write-Host "`t[16] `tDump Wifi Passwords"
     Write-Host "`t[17] `tBitdefender Remover Tool"
     Write-Host "`t[18] `tPC info"
+    Write-Host "`t[19] `tSpotX"
 
     "";
     Write-Host "`t[0] - Exit"
@@ -112,6 +113,7 @@ do {
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
         17 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | iex}
         18 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | iex}
+        19 {iex "& { $(iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/spotx-official.github.io/main/run.ps1') } -confirm_uninstall_ms_spoti -confirm_spoti_recomended_over -podcasts_off -block_update_on -start_spoti -new_theme -adsections_off -lyrics_stat spotify"}
         
         Default {}}
 }
