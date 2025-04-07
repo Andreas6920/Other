@@ -53,7 +53,7 @@ do {
         5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
         6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
         7 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression}
-        8 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deploy-project-part1.ps1 | Invoke-Expression"}
+        8 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deploy-project-part1.ps1" | Invoke-Expression}
         9 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/print_project/main/print-script.ps1" | Invoke-Expression}
         10 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/action.ps1" | Invoke-Expression}
         11 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1" | Invoke-Expression}
