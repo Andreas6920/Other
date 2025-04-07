@@ -10,7 +10,7 @@
     $ProgressPreference = "Continue" #unhide progressbar
 #>
 
-# Reinsure admin rights
+# Ensure admin rights
     If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
     {# Relaunch as an elevated process
     $Script = $MyInvocation.MyCommand.Path
@@ -104,21 +104,21 @@ do {
     $option = Read-Host
     Switch ($option) { 
         0 {exit}
-        1 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1"}
-        2 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1"}
-        3 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/office-template.txt"}
-        4 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1"}
+        1 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression}
+        2 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression}
+        3 {<# Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/office-template.txt" | Invoke-Expression #>}
+        4 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1" | Invoke-Expression}
         5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
         6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
-        7 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1"}
-        8 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deploy-project-part1.ps1"}
-        9 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/print_project/main/print-script.ps1"}
-        10 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/action.ps1"}
-        11 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1"}
-        12 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1"}
-        13 {Start-Script -Link "https://www.nirsoft.net/utils/wnetwatcher-x64.zip" -ProgramName "WNetWatcher.exe"}
+        7 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression}
+        8 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deploy-project-part1.ps1 | Invoke-Expression"}
+        9 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/print_project/main/print-script.ps1" | Invoke-Expression}
+        10 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/action.ps1" | Invoke-Expression}
+        11 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1" | Invoke-Expression}
+        12 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1" | Invoke-Expression}
+        13 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/WNetWatcher.ps1" | Invoke-Expression}
         14 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/SDI-Tool.ps1" | Invoke-Expression}
-        15 {Start-Script -Link "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
+        15 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"}
         16 {netsh wlan show profiles * key=clear | select-string -pattern "SSID name|Key content"}
         17 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | iex}
         18 {irm "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | iex}
