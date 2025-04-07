@@ -1,6 +1,8 @@
-Function Get-LogDate {
-    return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]")
-}
+# Author: Andreas Mouritsen
+# Description: Script til at hente og downloade SDI-Tool-fil fra sdi-tool.org
+
+# Timestampfunktionen
+Function Get-LogDate {return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]")}
 
 # URL til download-siden
 $url = "https://sdi-tool.org/download/"
@@ -9,15 +11,11 @@ $url = "https://sdi-tool.org/download/"
 $desktopPath = [System.IO.Path]::Combine([environment]::GetFolderPath("Desktop"), "SDI_Tool")
 
 # Opret mappen, hvis den ikke allerede eksisterer
-if (!(Test-Path -Path $desktopPath)) {
-    New-Item -ItemType Directory -Path $desktopPath | Out-Null
-}
-
+if (!(Test-Path -Path $desktopPath)) {New-Item -ItemType Directory -Path $desktopPath | Out-Null}
 Write-Host "$(Get-LogDate)`t    Opretter mappe til download på skrivebordet..." -ForegroundColor Green
 
 # Hent HTML-indholdet med Invoke-RestMethod
 $response = Invoke-RestMethod -Uri $url -Method Get
-
 Write-Host "$(Get-LogDate)`t    Henter HTML-indhold fra: $url" -ForegroundColor Green
 
 # Konverter HTML-indholdet til tekst
@@ -55,11 +53,8 @@ if ($match.Success) {
 
         # Kør .bat filen
         Start-Process -FilePath $batFilePath -NoNewWindow -Wait
-        Write-Host "$(Get-LogDate)`t    SDI_auto.bat filen er blevet kørt." -ForegroundColor Green
-    }
+        Write-Host "$(Get-LogDate)`t    SDI_auto.bat filen er blevet kørt." -ForegroundColor Green}
     else {
-        Write-Host "$(Get-LogDate)`t    Filen SDI_auto.bat blev ikke fundet i mappen: $desktopPath" -ForegroundColor Green
-    }
-} else {
-    Write-Host "$(Get-LogDate)`t    Ingen gyldig link blev fundet på siden." -ForegroundColor Green
-}
+        Write-Host "$(Get-LogDate)`t    Filen SDI_auto.bat blev ikke fundet i mappen: $desktopPath" -ForegroundColor Green}} 
+
+else { Write-Host "$(Get-LogDate)`t    Ingen gyldig link blev fundet på siden." -ForegroundColor Green }
