@@ -41,6 +41,7 @@ if ($match.Success) {
         Write-Host "$(Get-LogDate)`t        - Opretter mappe.." -ForegroundColor Yellow}
     else{
         Get-Process | Where-Object {$_.Name -like "SDI_x64*"} | Stop-Process
+        Write-Host "$(Get-LogDate)`t        - Sletter gamle filer.." -ForegroundColor Yellow
         Remove-item -Path $FolderPath\* -Recurse -force}
 
     # Download ZIP-filen
