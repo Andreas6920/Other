@@ -10,14 +10,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 # Timestamps for actions
 Function Get-LogDate { return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]") }
 
-# Start renaming
-Write-Host "$(Get-LogDate)Hostname: $ENV:COMPUTERNAME" -ForegroundColor Green
-
-Do {
-    Write-Host "Skal Computren omdøbes? (y/n)" -nonewline;
-    $Readhost = Read-Host " "
-    Switch ($ReadHost) {
-        Y {
+# Definer navn
             # Klargøring
                 Write-Host "$(Get-LogDate)`t    Navngiver PC." -ForegroundColor Green
             # Modtager brugertastning
@@ -36,25 +29,15 @@ Do {
                 $Forename = (Get-Culture).TextInfo.ToTitleCase($Forename)
                 $PCDescription = $Forename+" "+$Lastname + " PC"
         
-        # Navngiv PC
-            # Omdøb PC
-                $WarningPreference = "SilentlyContinue"
-                Write-Host "`t`t- COMPUTERNAVN:`t`t$PCName" -f Yellow;
-                if($PCName -ne $env:COMPUTERNAME){Rename-computer -newname $PCName}
-            # Omdøb PC Beskrivelse
-                $WarningPreference = "SilentlyContinue"
-                Write-Host "`t`t- BESKRIVELSE:`t`t$PCDescription" -f Yellow;
-                $ThisPCDescription = Get-WmiObject -class Win32_OperatingSystem
-                $ThisPCDescription.Description = $PCDescription
-                $ThisPCDescription.put() | out-null
-                Write-Host "$(Get-LogDate)`t    Computeren navngives ved genstart." -ForegroundColor Green
-
-        # Genstart
-            Start-Sleep -S 3
-            Write-Host "$(Get-LogDate)`t    Genstarter PC." -ForegroundColor Green
-            Start-Sleep -S 5
-            Restart-Computer -Force}
-
-        N { Write-Host "- Nej vi fortsætter..."; }
-    } 
-} While ($Readhost -notin "y", "n")
+# Navngiv PC
+    # Omdøb PC
+        $WarningPreference = "SilentlyContinue"
+        Write-Host "`t`t- COMPUTERNAVN:`t`t$PCName" -f Yellow;
+        if($PCName -ne $env:COMPUTERNAME){Rename-computer -newname $PCName}
+    # Omdøb PC Beskrivelse
+        $WarningPreference = "SilentlyContinue"
+        Write-Host "`t`t- BESKRIVELSE:`t`t$PCDescription" -f Yellow;
+        $ThisPCDescription = Get-WmiObject -class Win32_OperatingSystem
+        $ThisPCDescription.Description = $PCDescription
+        $ThisPCDescription.put() | out-null
+        Write-Host "$(Get-LogDate)`t    Computeren navngives ved genstart." -ForegroundColor Green
