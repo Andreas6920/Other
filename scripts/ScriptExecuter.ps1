@@ -1,4 +1,4 @@
-# Version 2.0
+# Version 1.0
 
 $ScriptRoot = Join-Path $Env:ProgramData "Script"
 $ExecutePath = Join-Path $ScriptRoot "Execute"
@@ -56,9 +56,7 @@ foreach ($Script in $ScriptFiles) {
         $ExecutionTimestamp = Get-Date -Format "yyyy.MM.dd-HH.mm.ss"
 
         # Start the script as a job with timeout protection
-        $Job = Start-Job -ScriptBlock {
-            param($ScriptPath)
-            powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File $ScriptPath
+      $ScriptPath
         } -ArgumentList $Script.FullName
 
         $JobCompleted = $Job | Wait-Job -Timeout (90 * 60)  # 1.5 hours in seconds
