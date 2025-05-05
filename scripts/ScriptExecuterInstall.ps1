@@ -33,7 +33,7 @@
             $text = Get-Date -f "yyyyMMddHHmmss"
             
             Write-host "- Yes" -f Yellow; Write-host "- Afvent popup" -f Yellow;
-            Set-Content -value "$text" -Path "C:\ProgramData\Script\RandomScript$text.ps1"; 
+            Set-Content -value "msg * $text" -Path "C:\ProgramData\Script\RandomScript$text.ps1"; 
             Start-ScheduledTask -TaskName $Taskname}
         N {Write-Host "- NO" -f Yellow;}
      } } While($Readhost -notin "y", "n")}

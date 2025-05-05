@@ -23,11 +23,11 @@ if (!(Test-Path $ExecuteFile)) {
 $OnlineVersion = (Invoke-WebRequest -Uri $ExecuteUrl -UseBasicParsing).Content.Split("`n")[0]
 $LocalVersion = Get-Content $ExecuteFile -TotalCount 1
 if ($OnlineVersion -ne $LocalVersion) {
-    Add-Content $LogFile "$(Get-LogDate)`tNew update detected!"
-    Add-Content $LogFile "$(Get-LogDate)`t    - Local version: $($LocalVersion)"
-    Add-Content $LogFile "$(Get-LogDate)`t    - Online version: $($OnlineVersion)"
+    Add-Content $LogFile "$(Get-LogDate)`tNEW UPDATE DETECTED!"
+    Add-Content $LogFile "$(Get-LogDate)`t    Local version: $($LocalVersion)"
+    Add-Content $LogFile "$(Get-LogDate)`t    Online version: $($OnlineVersion)"
     (New-Object net.webclient).Downloadfile($ExecuteUrl, $ExecuteFile) | Out-Null
-    Add-Content $LogFile "$(Get-LogDate)`tScript updated"
+    Add-Content $LogFile "$(Get-LogDate)`t    Script updated."
 
     # Restart the updated script and exit current one
     Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$ExecuteFile`"" -WindowStyle Hidden
@@ -46,18 +46,19 @@ foreach ($Script in $ScriptFiles) {
     $ArchiveFolder = Join-Path $ArchivePath $Timestamp
 
     # Logs
-    Add-Content $LogFile "$(Get-LogDate)`tNew script detected!"
-    Add-Content $LogFile "$(Get-LogDate)`t    - Name: $($Script.Name)"
-    Add-Content $LogFile "$(Get-LogDate)`t    - Hash: $ScriptHash"
-    Add-Content $LogFile "$(Get-LogDate)`t    - Script execution initiated"
+    Add-Content $LogFile "$(Get-LogDate)`tNEW SCRIPT DETECTED!"
+    Add-Content $LogFile "$(Get-LogDate)`t    Information: $($Script.Name)"
+    Add-Content $LogFile "$(Get-LogDate)`t        - Name: $($Script.Name)"
+    Add-Content $LogFile "$(Get-LogDate)`t        - Hash: $ScriptHash"
+    Add-Content $LogFile "$(Get-LogDate)`t    Script execution initiated."
 
     # Execute the script using dot-sourcing
     . $Script.FullName
-    Add-Content $LogFile "$(Get-LogDate)`t    - Script execution finished"
+    Add-Content $LogFile "$(Get-LogDate)`t    Script execution finished."
 
     # Archive script
     if (!(Test-Path $ArchiveFolder)) { New-Item -ItemType Directory -Path $ArchiveFolder | Out-Null }
     Move-Item -Path $Script.FullName -Destination $ArchiveFolder
-    Add-Content $LogFile "$(Get-LogDate)`t    - Script moved to $ArchiveFolder"
-    Add-Content $LogFile "#########################################################################################################"
+    Add-Content $LogFile "$(Get-LogDate)`t    Script moved to $ArchiveFolder"
+    Add-Content $LogFile "#######################################################################################################"
 } 
