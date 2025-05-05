@@ -12,8 +12,8 @@
     # Setting Scheduled Task
     $Taskname = "Action1 Script Automation 1.0"
     $Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $outputPath"
-    $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -AllowStartIfOnBatteries -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
-    $Tasktrigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek 'Monday','Tuesday','Wednesday','Thursday','Friday' -At 11:50
+    $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '03:00:00' -RunOnlyIfNetworkAvailable -DontStopIfGoingOnBatteries -DontStopOnIdleEnd
+    $Tasktrigger = New-ScheduledTaskTrigger -AtLogOn
     $User = [Environment]::UserName
     Write-Host "- Planlæg opgave." -f Yellow;
     Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
@@ -21,6 +21,8 @@
     Write-Host "- Opgavenavn: $Taskname" -f Yellow;
     Write-Host "- Fuldført." -f Yellow;
 
+    Start (Split-Path -Path $outputPath) 
+    
 
     While($True) {
     Do {
