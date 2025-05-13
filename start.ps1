@@ -38,6 +38,7 @@ do {
     Write-Host "`t[17] `tBitdefender Remover Tool"
     Write-Host "`t[18] `tPC info"
     Write-Host "`t[19] `tInstall SpotX"
+    Write-Host "`t[20] `tTron Script"
 
     "";
     Write-Host "`t[0] - Exit"
@@ -53,7 +54,7 @@ do {
         5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
         6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
         7 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression}
-        8 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deploy-project-part1.ps1" | Invoke-Expression}
+        8 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-project.ps1" | Invoke-Expression}
         9 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/print_project/main/print-script.ps1" | Invoke-Expression}
         10 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/InstallActionOne.ps1" | Invoke-Expression}
         11 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1" | Invoke-Expression}
@@ -65,7 +66,8 @@ do {
         17 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/bitremove.ps1" | Invoke-Expression}
         18 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | Invoke-Expression}
         19 {iex "& { $(iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/spotx-official.github.io/main/run.ps1') } -confirm_uninstall_ms_spoti -confirm_spoti_recomended_over -podcasts_off -block_update_on -start_spoti -new_theme -adsections_off -lyrics_stat spotify"}
+        20 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/TronScript.ps1" | Invoke-Expression}
         
         Default {}}
 }
-while ($option -ne 19 )
+while ($option -ne 20 )
