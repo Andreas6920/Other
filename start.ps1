@@ -49,7 +49,7 @@ do {
         0 {exit}
         1 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression}
         2 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression}
-        3 {irm "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | IEX; Install-App -Name Office}
+        3 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression; Install-App -Name Office}
         4 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/download-windows.ps1" | Invoke-Expression}
         5 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /Ohook}
         6 {& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID}
