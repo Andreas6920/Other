@@ -1,34 +1,44 @@
 # Konfiguration
-$Link = "https://www.nirsoft.net/utils/wnetwatcher-x64.zip"
-$FileName = "wnetwatcher-x64.zip"
-$TempPath = [System.IO.Path]::Combine($env:TEMP, "WNetWatcher")
-$ZipPath = [System.IO.Path]::Combine($TempPath, $FileName)
-$ExtractedFolder = $TempPath
+$PageUrl = "https://diskanalyzer.com/download"
+$TempPath = Join-Path $TempPath "WizTreePortable"
+$ZipPath = Join-Path $TempPath "wiztree.zip"
 
-# Ryd op hvis eksisterende mappe findes
-if (Test-Path $ExtractedFolder) {Remove-Item -Path $ExtractedFolder -Recurse -Force | Out-Null}
-New-Item -ItemType Directory -Path $ExtractedFolder | Out-Null
+# Ryd op hvis mappen findes
+if (Test-Path $TempPath) { Remove-Item $TempPath -Recurse -Force | Out-Null }
+New-Item -ItemType Directory -Path $TempPath | Out-Null
 
-# Download af filen
-Write-Host "`t- Downloading file..." -ForegroundColor Green
-Invoke-RestMethod -Uri $Link -OutFile $ZipPath
+# Hent HTML fra download-siden
+Write-Host "`t- Henter download-side..." -ForegroundColor Green
+$html = Invoke-WebRequest -Uri $PageUrl -UseBasicParsing
 
-# Ekstraktion af filen
-Write-Host "`t- Extracting file using Expand-Archive..." -ForegroundColor Green
+# Find downloadlink som slutter på _portable.zip
+$downloadLink = ($html.Links | Where-Object { $_.href -match "_portable\.zip$" }).href
+
+# Hvis det er et relativt link, tilføj base URL
+if ($downloadLink -notmatch "^https?://") {
+    $downloadLink = "https://diskanalyzer.com$downloadLink"
+}
+
+# Download ZIP-filen
+Write-Host "`t- Downloader: $downloadLink" -ForegroundColor Green
+Invoke-RestMethod -Uri $downloadLink -OutFile $ZipPath
+
+# Udpak
+Write-Host "`t- Udpakker filen..." -ForegroundColor Green
 try {
-    Expand-Archive -Path $ZipPath -DestinationPath $ExtractedFolder -Force
-    Write-Host "`t- Extraction successful to: $ExtractedFolder" -ForegroundColor Green} 
-catch {
-    Write-Host "`t- Extraction failed: $_" -ForegroundColor Red
-    Exit}
+    Expand-Archive -Path $ZipPath -DestinationPath $TempPath -Force
+    Write-Host "`t- Ekstraktion lykkedes: $TempPath" -ForegroundColor Green
+} catch {
+    Write-Host "`t- Fejl under udpakning: $_" -ForegroundColor Red
+    exit
+}
 
-# Find og kør WNetWatcher.exe
-$ExePath = Join-Path -Path $ExtractedFolder -ChildPath "WNetWatcher.exe"
-if (Test-Path $ExePath) {
-    Write-Host "`t- Running WNetWatcher.exe..." -ForegroundColor Green
-    Start-Process -FilePath $ExePath -NoNewWindow}
-else {    Write-Host "`t- WNetWatcher.exe could not be found in $ExtractedFolder" -ForegroundColor Red  }
+# Find og start WizTree.exe
+$ExePath = Get-ChildItem -Path $TempPath -Filter "WizTree*.exe" -Recurse | Where-Object { $_.Name -match "^WizTree.*\.exe$" } | Select-Object -First 1
 
-# Ryd op efter sig selv (Valgfrit - fjern # for at aktivere)
-# Write-Host "`t- Cleaning up temporary files..." -ForegroundColor Green
-# Remove-Item -Path $ZipPath -Force
+if ($ExePath) {
+    Write-Host "`t- Starter $($ExePath.Name)..." -ForegroundColor Green
+    Start-Process -FilePath $ExePath.FullName -NoNewWindow
+} else {
+    Write-Host "`t- WizTree EXE ikke fundet." -ForegroundColor Red
+}
