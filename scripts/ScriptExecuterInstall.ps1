@@ -12,7 +12,7 @@
     $Taskname = "Device Maintenance"
     $Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $ScriptPath"
     $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '01:30:00' -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -RunOnlyIfNetworkAvailable -StartWhenAvailable
-    $Tasktrigger = New-ScheduledTaskTrigger -Daily -At 08:50 -RandomDelay (New-TimeSpan -Minutes 5)
+    $Tasktrigger = New-ScheduledTaskTrigger -Daily -At 12:05 -RandomDelay (New-TimeSpan -Minutes 5)
     $User = [Environment]::UserName
     Write-Host "- Planlæg opgave." -f Yellow;
     Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
