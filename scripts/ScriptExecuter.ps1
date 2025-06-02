@@ -1,6 +1,6 @@
 # Version 1.0
 
-$ScriptRoot = Join-Path $Env:ProgramData "Script"
+$ScriptRoot = Join-Path $Env:ProgramData "AM"
 $ExecutePath = Join-Path $ScriptRoot "Execute"
 $ExecuteFile = Join-Path $ExecutePath "ScriptExecuter.ps1"
 $ExecuteUrl = "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/ScriptExecuter.ps1"

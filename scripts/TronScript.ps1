@@ -53,4 +53,4 @@ Copy-Item -Path $batchFilePath -Destination $desktopPath -Force | Out-Null
 Write-Host "`t - Executing Tron Script.."
 $tronBatchFile = Join-Path $desktopPath "tron.bat"
 Start-Sleep -Seconds 5
-Start-Process -FilePath $tronBatchFile -ArgumentList "-a -e -sdb" -Wait
+Start-Process -FilePath $tronBatchFile -ArgumentList "-a -e -sdb -r" -Wait
