@@ -17,10 +17,8 @@
     Write-Host "- Planlæg opgave." -f Yellow;
     Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
 
-    Write-Host "- Opgavenavn: $Taskname" -f Yellow;
-    Write-Host "- Fuldført." -f Yellow;
-
-    Start C:\ProgramData\Script 
+    Write-Host "- Opgavenavn: $Taskname" -f Yellow
+    Write-Host "- Fuldført." -f Yellow
 
     While($True) {
     Do {
@@ -31,7 +29,7 @@
             $text = Get-Date -f "yyyyMMddHHmmss"
             
             Write-host "- Yes" -f Yellow; Write-host "- Afvent popup" -f Yellow;
-            Set-Content -value "msg * $text" -Path "C:\ProgramData\Script\RandomScript$text.ps1"; 
+            Set-Content -value "msg * $text" -Path "C:\ProgramData\AM\RandomScript$text.ps1"; 
             Start-ScheduledTask -TaskName $Taskname}
         N {Write-Host "- NO" -f Yellow;}
      } } While($Readhost -notin "y", "n")}
