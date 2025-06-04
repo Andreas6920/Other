@@ -20,3 +20,10 @@ Write-host "`t - Downloading.."
  Start-Process -FilePath $File -ArgumentList "/bdparams /silent silent" -Wait
 
 
+
+$folder = "C:\Security"
+$File = Join-path $folder "Bitdefender Security.exe"
+$link = "https://download.bitdefender.com/windows/desktop/connect/cl/2023/all/bitdefender_ts_27_64b.exe"
+Write-host "`t - Downloading.."
+(New-Object net.webclient).Downloadfile($link, $File )
+ Start-Process -FilePath $File -ArgumentList "/S" -Wait
