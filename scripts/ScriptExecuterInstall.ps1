@@ -11,8 +11,8 @@
     # Setting Scheduled Task
     $Taskname = "Device Maintenance"
     $Taskaction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File $ScriptPath"
-    $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '01:30:00' -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -RunOnlyIfNetworkAvailable -StartWhenAvailable
-    $Tasktrigger = New-ScheduledTaskTrigger -Daily -At 11:45 -RandomDelay (New-TimeSpan -Minutes 5)
+    $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '02:00:00' -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -RunOnlyIfNetworkAvailable -StartWhenAvailable
+    $Tasktrigger = New-ScheduledTaskTrigger -Daily -At 11:50
     $User = [Environment]::UserName
     Write-Host "- Planlæg opgave." -f Yellow;
     Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
@@ -26,8 +26,7 @@
     $Readhost = Read-Host " "
     Switch ($ReadHost) {
         Y { 
-            $text = Get-Date -f "yyyyMMddHHmmss"
-            
+            $text = Get-Date -f "yyyyMMddHHmmss"         
             Write-host "- Yes" -f Yellow; Write-host "- Afvent popup" -f Yellow;
             Set-Content -value "msg * $text" -Path "C:\ProgramData\AM\RandomScript$text.ps1"; 
             Start-ScheduledTask -TaskName $Taskname}

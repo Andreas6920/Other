@@ -16,8 +16,9 @@
     Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
 
 # Menu starts
-Clear-Host
+
 do {
+    Write-Host "`n`n";
     Write-Host "`tMENU" -f Yellow;"";
     Write-Host "`t[1] `tModule: Windows-Optimizer"
     Write-Host "`t[2] `tModule: Windows-Server-Automator"
