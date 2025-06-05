@@ -1,10 +1,9 @@
-<#
+
 # Ensure admin rights
     If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
     {# Relaunch as an elevated process
     $Script = $MyInvocation.MyCommand.Path
     Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy RemoteSigned", "-File `"$Script`""}
-#>
 
 # Execution policy
     Set-ExecutionPolicy -Scope Process Unrestricted -Force
@@ -12,15 +11,10 @@
 # TLS upgrade
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
-# Disable Explorer first run
-    If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main")) {
-    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Force | Out-Null}
-    Set-ItemProperty -Path  "HKLM:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize"  -Value 1
-
 # Menu starts
 
 do {
-    Write-Host "`n`n";
+    Write-Host "`n";
     Write-Host "`tMENU" -f Yellow;"";
     Write-Host "`t[1] `tModule: Windows-Optimizer"
     Write-Host "`t[2] `tModule: Windows-Server-Automator"
