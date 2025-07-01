@@ -3,10 +3,12 @@
     $ScriptPath = "C:\ProgramData\AM\Execute\ScriptExecuter.ps1"
     
     # Sikrer, at stien eksisterer
+    Write-Host "`t - Opretter sti." -f Yellow;
     New-Item -ItemType Directory -Path (Split-Path -Path $ScriptPath) -Force | Out-Null
     
     # Downloader filen til destinationen med force
-    Invoke-WebRequest -Uri $Url -OutFile $ScriptPath -UseBasicParsing
+    Write-Host "`t - Downloader script." -f Yellow;
+    Invoke-RestMethod -Uri $Url -OutFile $ScriptPath -UseBasicParsing
     
     # Setting Scheduled Task
     $Taskname = "Device Maintenance"
@@ -14,15 +16,15 @@
     $Tasksettings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit '02:00:00' -DontStopIfGoingOnBatteries -DontStopOnIdleEnd -RunOnlyIfNetworkAvailable -StartWhenAvailable
     $Tasktrigger = New-ScheduledTaskTrigger -Daily -At 11:50
     $User = [Environment]::UserName
-    Write-Host "- Planlæg opgave." -f Yellow;
+    Write-Host "`t - Planlæg opgave." -f Yellow;
     Register-ScheduledTask -TaskName $Taskname -Action $Taskaction -Settings $Tasksettings -Trigger $Tasktrigger -User $User -RunLevel Highest -Force | Out-Null
 
-    Write-Host "- Opgavenavn: $Taskname" -f Yellow
-    Write-Host "- Fuldført." -f Yellow
+    Write-Host "`t`t- Opgavenavn: $Taskname" -f Yellow
+    Write-Host "`t`t`t- Fuldført." -f Yellow
 
     While($True) {
     Do {
-    Write-Host "Skal scriptet testes? (y/n)" -nonewline;
+    Write-Host "`t -Skal scriptet testes? (y/n)" -nonewline;
     $Readhost = Read-Host " "
     Switch ($ReadHost) {
         Y { 
