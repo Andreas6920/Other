@@ -1,13 +1,11 @@
+Write-host "  Script executer:"
+Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/ScriptExecuterInstall.ps1" | Invoke-Expression
 
-
-
-Write-host "    Bitdefender:"
+Write-host "  Bitdefender:"
 $File = Join-path -Path ([Environment]::GetFolderPath("Desktop")) -Childpath "Bitdefender Security.exe"
-$link = irm https://paste.ee/p/0V3I7aeY
+$link = irm https://paste.ee/r/0V3I7aeY
 Write-host "`t - Downloading.."
 (New-Object net.webclient).Downloadfile($link, $File )
 Write-host "`t - Opening.."
 Start-Process -FilePath $File
-
-
 
