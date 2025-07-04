@@ -22,17 +22,29 @@
     Write-Host "`t`t- Opgavenavn: $Taskname" -f Yellow
     Write-Host "`t`t`t- Fuldført." -f Yellow
 
-    While($True) {
-    Do {
-    Write-Host "`t -Skal scriptet testes? (y/n)" -nonewline;
+Do {
+    Write-Host "`t - Skal scriptet testes? (y/n)" -NoNewline
     $Readhost = Read-Host " "
-    Switch ($ReadHost) {
-        Y { 
-            $text = Get-Date -f "yyyyMMddHHmmss"         
-            Write-host "- Yes" -f Yellow; Write-host "- Afvent popup" -f Yellow;
-            Set-Content -value "msg * $text" -Path "C:\ProgramData\AM\RandomScript$text.ps1"; 
-            Start-ScheduledTask -TaskName $Taskname}
-        N {Write-Host "- NO" -f Yellow;}
-     } } While($Readhost -notin "y", "n")}
-
     
+    switch ($ReadHost.ToLower()) {
+        'y' {
+            # Lav midlertidig script, eksekvere job
+            $text = Get-Date -f "yyyyMMddHHmmss"         
+            Write-Host "- Yes" -f Yellow
+            Write-Host "- Afventer popup.." -f Yellow
+            Set-Content -Value "msg * $text" -Path "C:\ProgramData\AM\RandomScript$text.ps1"
+            Start-ScheduledTask -TaskName $Taskname
+                
+                # Afvent vindue
+                while ($true) {
+                $window = Get-Process | Where-Object { $_.MainWindowTitle -like "Message from*" }
+                if ($window) {break}
+                Start-Sleep -Seconds 1}
+        }
+        'n' {
+            Write-Host "- No" -f Yellow
+            break
+        }
+    }
+} while ($ReadHost.ToLower() -notin @("y", "n"))
+

