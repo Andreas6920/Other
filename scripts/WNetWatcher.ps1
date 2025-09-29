@@ -1,58 +1,33 @@
 # Konfiguration
-$PageUrl  = "https://diskanalyzer.com/download"
-$BaseUri  = [Uri]"https://diskanalyzer.com/"
-$TempPath = Join-Path $env:TEMP "WizTreePortable"
-$ZipPath  = Join-Path $TempPath "wiztree.zip"
+$Link = "https://www.nirsoft.net/utils/wnetwatcher-x64.zip"
+$FileName = "TemporaryZipFile.zip"
+$TempFolder = Join-Path -Path "$Env:TMP\TemporaryFolder" -ChildPath $FileName
+$ExtractedFolder = Split-Path $TempFolder -Parent
 
-# Ryd op hvis mappen findes
-if (Test-Path $TempPath) { Remove-Item $TempPath -Recurse -Force | Out-Null }
-New-Item -ItemType Directory -Path $TempPath | Out-Null
+# Ryd op hvis eksisterende mappe findes
+if (Test-Path $ExtractedFolder) { Remove-Item -Path $ExtractedFolder -Recurse -Force | Out-Null }
+New-Item -ItemType Directory -Path $ExtractedFolder | Out-Null
 
-# Hent HTML fra download-siden
-Write-Host "`t- Henter download-side..." -ForegroundColor Green
-# UseBasicParsing er ignoreret i PowerShell 7+, men skader ikke i Windows PowerShell 5.1
-$html = Invoke-WebRequest -Uri $PageUrl -UseBasicParsing
+# Download af filen
+Write-Host "`t- Downloading file..." -ForegroundColor Green
+Invoke-RestMethod -Uri $Link -OutFile $TempFolder
 
-# Forsøg først via .Links, fald tilbage til regex på .Content hvis nødvendigt
-$relative = ($html.Links | Where-Object { $_.href -match "_portable\.zip$" } | Select-Object -First 1).href
-if (-not $relative) {
-    # Fald tilbage til regex på HTML-indhold
-    $match = [regex]::Match($html.Content, 'href="(?<u>[^"]*_portable\.zip)"', 'IgnoreCase')
-    if ($match.Success) { $relative = $match.Groups['u'].Value }
-}
-
-if (-not $relative) {
-    Write-Error "Kunne ikke finde et link der slutter på _portable.zip på $PageUrl"
-    exit 1
-}
-
-# Kombinér base og relativ URL korrekt, uanset om der er leading slash eller ej
-$downloadUri = [Uri]::new($BaseUri, $relative)
-
-Write-Host "`t- Downloader: $downloadUri" -ForegroundColor Green
-
-# Download ZIP-filen
-# Brug Invoke-WebRequest her, da den har stabil -OutFile på tværs af PS-versioner
-Invoke-WebRequest -Uri $downloadUri -OutFile $ZipPath -UseBasicParsing
-
-# Udpak
-Write-Host "`t- Udpakker filen..." -ForegroundColor Green
+# Ekstraktion af filen
+Write-Host "`t- Extracting file..." -ForegroundColor Green
 try {
-    Expand-Archive -Path $ZipPath -DestinationPath $TempPath -Force
-    Write-Host "`t- Ekstraktion lykkedes: $TempPath" -ForegroundColor Green
-} catch {
-    Write-Host "`t- Fejl under udpakning: $_" -ForegroundColor Red
-    exit 1
+    Expand-Archive -Path $TempFolder -DestinationPath $ExtractedFolder -Force
+    Write-Host "`t- Extraction successful to: $ExtractedFolder" -ForegroundColor Green
 }
+catch { Write-Host "`t-Udpakningen fejlede: $_" -ForegroundColor Red; Exit }
 
-# Find og start WizTree.exe
-$ExePath = Get-ChildItem -Path $TempPath -Filter "WizTree*.exe" -Recurse |
-           Where-Object { $_.Name -match "^WizTree.*\.exe$" } |
-           Select-Object -First 1
+# Ryd op efter sig selv
+Write-Host "`t- Cleaning up temporary files..." -ForegroundColor Green
+Remove-Item -Path $TempFolder -Force
+Write-Host "`t- Operation completed successfully!" -ForegroundColor Green
 
-if ($ExePath) {
-    Write-Host "`t- Starter $($ExePath.Name)..." -ForegroundColor Green
-    Start-Process -FilePath $ExePath.FullName
-} else {
-    Write-Host "`t- WizTree EXE ikke fundet." -ForegroundColor Red
-}
+# Kørsel af det ønskede program/script
+Write-Host "`t- Running extracted content..." -ForegroundColor Green
+Start-Process  &.\WNetWatcher.exe
+
+# Åben af udpakket mappe
+# Start $ExtractedFolder
