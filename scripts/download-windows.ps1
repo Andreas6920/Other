@@ -1,1 +1,2 @@
-﻿Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1')); ;
+# Test
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1'))
