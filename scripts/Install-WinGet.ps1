@@ -1,16 +1,13 @@
-$ProgressPreference = "SilentlyContinue"
+if (-not (Get-Command Winget -ErrorAction SilentlyContinue)) {
+    # Setup Script
+        $script ="Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force; Install-Script -Name winget-install -Force; winget-install"
+        $scriptPath = Join-Path $env:TEMP "Install-Winget.ps1"
+        Set-Content -Path $scriptPath -Encoding UTF8 -Value $script
+    # Setup Execution
+        $argList = "-NoProfile -ExecutionPolicy RemoteSigned -WindowStyle Minimized -File `"$scriptPath`""
+    # Execute
+        # If not admin - prompt for admin rights - then execute
+        if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList $argList -Wait; return}
+        # If admin - execute
+        Start-Process -FilePath "powershell.exe" -ArgumentList $argList -Wait}
 
-# Install NuGet
-    if(!(test-path "C:\Program Files\PackageManagement\ProviderAssemblies\nuget\2.8.5.208")){
-    Write-Host "Installing NuGet" -ForegroundColor Yellow
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null;
-    Write-Host "`t- Installation complete." -ForegroundColor DarkYellow}
-
-# Install WinGet
-    if(!(Get-Command winget -ErrorAction SilentlyContinue)){
-    Write-Host "Installing WinGet" -ForegroundColor Yellow
-    $job = Start-Job -ScriptBlock { Install-Script -Name winget-install -Force ; winget-install}
-    Wait-Job $job | Out-Null
-    Write-Host "`t- Installation complete." -ForegroundColor DarkYellow}
-
-$ProgressPreference = "Continue"
