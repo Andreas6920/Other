@@ -1,2 +1,1 @@
-# Test
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1'))
+Invoke-RestMethod https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 | Invoke-Expression
