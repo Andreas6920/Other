@@ -1,33 +1,53 @@
-# Konfiguration
+
+# Configuration
 $Link = "https://www.nirsoft.net/utils/wnetwatcher-x64.zip"
-$FileName = "TemporaryZipFile.zip"
-$TempFolder = Join-Path -Path "$Env:TMP\TemporaryFolder" -ChildPath $FileName
-$ExtractedFolder = Split-Path $TempFolder -Parent
+$FileName = "WNetWatcher.zip"
+$BaseTemp = Join-Path $Env:TEMP "WNetWatcher_Temp"
+$TempZip = Join-Path $BaseTemp $FileName
+$ExtractedFolder = $BaseTemp
 
-# Ryd op hvis eksisterende mappe findes
-if (Test-Path $ExtractedFolder) { Remove-Item -Path $ExtractedFolder -Recurse -Force | Out-Null }
-New-Item -ItemType Directory -Path $ExtractedFolder | Out-Null
+# if already exist, remove it first
+if (Test-Path $BaseTemp) { Remove-Item -Path $BaseTemp -Recurse -Force -ErrorAction SilentlyContinue }
+New-Item -ItemType Directory -Path $BaseTemp -Force | Out-Null
 
-# Download af filen
+# Download file
 Write-Host "`t- Downloading file..." -ForegroundColor Green
-Invoke-RestMethod -Uri $Link -OutFile $TempFolder
+try {
+    Invoke-WebRequest -Uri $Link -OutFile $TempZip -UseBasicParsing
+} catch {
+    Write-Host "`t- Download failed: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
 
-# Ekstraktion af filen
+# Extract file
 Write-Host "`t- Extracting file..." -ForegroundColor Green
 try {
-    Expand-Archive -Path $TempFolder -DestinationPath $ExtractedFolder -Force
+    Expand-Archive -Path $TempZip -DestinationPath $ExtractedFolder -Force
     Write-Host "`t- Extraction successful to: $ExtractedFolder" -ForegroundColor Green
+} catch {
+    Write-Host "`t- Extraction failed: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
 }
-catch { Write-Host "`t-Udpakningen fejlede: $_" -ForegroundColor Red; Exit }
 
-# Ryd op efter sig selv
-Write-Host "`t- Cleaning up temporary files..." -ForegroundColor Green
-Remove-Item -Path $TempFolder -Force
-Write-Host "`t- Operation completed successfully!" -ForegroundColor Green
+# Find executable in extracted folder
+$exe = Get-ChildItem -Path $ExtractedFolder -Filter "WNetWatcher*.exe" -File -Recurse | Select-Object -First 1
+if (-not $exe) {
+    Write-Host "`t- Could not locate WNetWatcher executable after extraction." -ForegroundColor Red
+    Write-Host "`t- Contents of extracted folder:" -ForegroundColor Yellow
+    Get-ChildItem -Path $ExtractedFolder -Recurse | Format-List FullName
+    exit 1
+}
 
-# Kørsel af det ønskede program/script
+# Execute program
 Write-Host "`t- Running extracted content..." -ForegroundColor Green
-Start-Process  &.\WNetWatcher.exe
+try {
+    Start-Process -FilePath $exe.FullName -WorkingDirectory $exe.DirectoryName
+} catch {
+    Write-Host "`t- Failed to start process: $($_.Exception.Message)" -ForegroundColor Red
+}
 
-# Åben af udpakket mappe
-# Start $ExtractedFolder
+# Cleanup
+Write-Host "`t- Cleaning up temporary files..." -ForegroundColor Green
+Remove-Item -Path $TempZip -Force -ErrorAction SilentlyContinue
+
+Write-Host "`t- Operation completed successfully!" -ForegroundColor Green
