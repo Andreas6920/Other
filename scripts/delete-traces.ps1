@@ -1,168 +1,220 @@
-﻿    
-# Personal folders   
-Write-host "`t    - Deleting personal user files.." -f yellow; start-job -Name "Personal documents files" -ScriptBlock {
-    # My Dcouments, Videos, Photos etc..
-    Get-Childitem $env:userprofile | % { Get-ChildItem $_.FullName | remove-item -Recurse -Force -ea SilentlyContinue } | ? { ! $_.PSIsContainer } } | Out-Null
-    
-# Personal system files
-Write-host "`t    - Deleting personal system files.." -f yellow; start-job -Name "Personal system files" -ScriptBlock {
-    # Recent files
-    Write-host "`t    - Recent files.." -f yellow
-    Get-ChildItem "$env:APPDATA\Microsoft\Windows\Recent\*" -File -Force -Exclude "desktop.ini" | Remove-Item -Force -ea SilentlyContinue
-    Get-ChildItem "$env:APPDATA\Microsoft\Windows\Recent\CustomDestinations\*" -File -Force -Exclude "desktop.ini" | Remove-Item -Force -ea SilentlyContinue
-    Get-ChildItem "$env:APPDATA\Microsoft\Windows\Recent\AutomaticDestinations\*" -File -Force -Exclude "desktop.ini" | Remove-Item -Force -ea SilentlyContinue
-    # Temp folders
-    $UserCreationDate = get-date ((Get-Item $($env:USERPROFILE)).CreationTime); $UserCreationDate = $UserCreationDate.ToShortDateString()
-    (Get-ChildItem "c:\windows\temp\" -Recurse | ? { $UserCreationDate -notcontains $_.CreationTime.ToShortDateString() }).FullName | Remove-Item -Recurse -Force -ea SilentlyContinue
-    Remove-Item -path $($env:TMP) -Recurse -Force -ea SilentlyContinue } | Out-Null                            
+﻿
+# Delete files
 
-# Customized shortcuts, pinned stuff
-Write-host "`t    - Deleting personal shortcuts, pinned stuff.." -f yellow; start-job -Name "Personal system files" -ScriptBlock {
-    # Desktop
-    $path = [Environment]::GetFolderPath("Desktop")
-    Get-Childitem $path | remove-item -Recurse -Force -ea SilentlyContinue | Out-Null
-    # Taskbar
-    Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesChanges -Value 3 -Type Dword -Force | Out-Null
-    Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesRemovedChanges -Value 32 -Type Dword -Force | Out-Null
-    Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name FavoritesVersion -Value 3 -Type Dword -Force | Out-Null
-    Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband -Name Favorites -Value ([byte[]](0xFF)) -Force | Out-Null
-    Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowCortanaButton -Type DWord -Value 0 | Out-Null
-    Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Search -Name SearchboxTaskbarMode -Value 0 -Type Dword | Out-Null
-    set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name ShowTaskViewButton -Type DWord -Value 0 | Out-Null
-    Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Recurse -Force | Out-Null
-    # Startmenu
-    Write-host "`t    - Startmenu.." -f yellow
-    $layoutFile = "$env:SystemRoot\StartMenuLayout.xml"
-    Remove-Item $layoutFile -Force -ea SilentlyContinue
-    Invoke-WebRequest -uri "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/res/StartMenuLayout.xml" -OutFile $layoutFile
-    $regAliases = @("HKLM", "HKCU")
-    foreach ($regAlias in $regAliases) {
-        $basePath = $regAlias + ":\Software\Policies\Microsoft\Windows"
-        $keyPath = $basePath + "\Explorer" 
-        IF (!(Test-Path -Path $keyPath)) { New-Item -Path $basePath -Name "Explorer" | Out-Null }
-        Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 1
-        Set-ItemProperty -Path $keyPath -Name "StartLayoutFile" -Value $layoutFile
+  # Configuration
+    $ErrorActionPreference = 'SilentlyContinue'
+    $userRoot = "C:\Users\$env:USERNAME"
+    $DefaultUserFolders = @(
+        'documents','my documents','dokumenter','3d objects','3d-objekter','contacts','kontakter',
+        'desktop','skrivebord','downloads','overførsler','overforsler','favorites','favoritter',
+        'links','music','musik','pictures','billeder','saved games','gemte spil',
+        'searches','søgninger','soegninger','videos','videoer')
+    $DefaultSystemFolders = @(
+        'onedrive','appdata','application data','cookies','local settings','lokale indstillinger',
+        'start menu','menuen start','printers','printere','andre computere',
+        'sendto','recent','templates','nethood','printhood')
+    # Set common case for identical comparison
+    $UserAllow  = $DefaultUserFolders   | ForEach-Object { $_.ToLowerInvariant() }
+    $SystemKeep = $DefaultSystemFolders | ForEach-Object { $_.ToLowerInvariant() }
+
+# Emptying windows default user folders
+    Write-Host "  - Deleting personal files:" -ForegroundColor Yellow
+
+    Get-ChildItem $userRoot -Directory -Force | ForEach-Object {
+        $name = $_.Name.ToLowerInvariant()
+        if ($UserAllow -contains $name -and $SystemKeep -notcontains $name) {
+        Get-ChildItem $_.FullName -Force | ForEach-Object {Write-Host "`t  $($_.FullName)"; Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue}}}
+
+# Delete personal folders that aren't system folders
+    Write-Host "  - Deleting personal folders:" -ForegroundColor Yellow
+    Get-ChildItem $userRoot -Force | ForEach-Object {
+        $name = $_.Name.ToLowerInvariant()
+        if ($_.PSIsContainer) {
+            if (
+                ($UserAllow -notcontains $name) -and
+                ($SystemKeep -notcontains $name)) {
+                Write-Host "`t  $($_.FullName)"
+                Remove-Item $_.FullName -Recurse -Force -ErrorAction SilentlyContinue}}
+        else {  Write-Host "`t  $($_.FullName)"
+                Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue}}
+
+
+# Delete logs
+
+    # Konfiguration
+        $DownloadPage = 'https://www.bleachbit.org/download/windows'
+        $TempPath     = [System.IO.Path]::GetTempPath()
+        $DesktopPath  = [Environment]::GetFolderPath('Desktop')
+        $ErrorActionPreference = 'Continue'
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    # Grab link from official website that includes portable.zip
+        $Html = Invoke-WebRequest -Uri $DownloadPage -UseBasicParsing
+        $FileUrl = ($Html.Links | Where-Object { $_.href -match 'portable\.zip$' }).href
+        $FileUrl= $FileUrl.Replace('/download/file/t?file=','https://download.bleachbit.org/')
+
+    # Download to temp
+        $zipFile = Join-Path $TempPath ([System.IO.Path]::GetFileName($FileUrl))
+        Invoke-WebRequest -Uri $FileUrl -OutFile $zipFile
+
+    # Extract folder to desktop
+        $extractFolder = $DesktopPath
+        Expand-Archive -LiteralPath $zipFile -DestinationPath $extractFolder -Force
+
+    # Find and execute rekursivt og eksekver
+        $exe = (Get-ChildItem -Path $extractFolder -Filter 'bleachbit_console.exe' -Recurse | Select-Object -First 1).FullName
+        #& $exe --clean system.logs
+
+    $Cleaners = @(
+    'adobe_reader.cache',
+    'adobe_reader.mru',
+    'adobe_reader.tmp',
+    'brave.cache',
+    'brave.cookies',
+    'brave.dom',
+    'brave.form_history',
+    'brave.history',
+    'brave.passwords',
+    'brave.search_engines',
+    'brave.session',
+    'brave.site_preferences',
+    'brave.sync',
+    'brave.vacuum',
+    'chromium.cache',
+    'chromium.cookies',
+    'chromium.dom',
+    'chromium.form_history',
+    'chromium.history',
+    'chromium.passwords',
+    'chromium.search_engines',
+    'chromium.session',
+    'chromium.site_preferences',
+    'chromium.sync',
+    'chromium.vacuum',
+    'deepscan.backup',
+    'deepscan.ds_store',
+    'deepscan.thumbs_db',
+    'deepscan.tmp',
+    'discord.cache',
+    'discord.cookies',
+    'discord.history',
+    'discord.vacuum',
+    'firefox.backup',
+    'firefox.cache',
+    'firefox.cookies',
+    'firefox.crash_reports',
+    'firefox.dom',
+    'firefox.forms',
+    'firefox.passwords',
+    'firefox.session_restore',
+    'firefox.site_preferences',
+    'firefox.url_history',
+    'firefox.vacuum',
+    'flash.cache',
+    'flash.cookies',
+    'google_chrome.cache',
+    'google_chrome.cookies',
+    'google_chrome.dom',
+    'google_chrome.form_history',
+    'google_chrome.history',
+    'google_chrome.passwords',
+    'google_chrome.search_engines',
+    'google_chrome.session',
+    'google_chrome.site_preferences',
+    'google_chrome.sync',
+    'google_chrome.vacuum',
+    'google_toolbar.search_history',
+    'internet_explorer.cache',
+    'internet_explorer.cookies',
+    'internet_explorer.downloads',
+    'internet_explorer.forms',
+    'internet_explorer.history',
+    'internet_explorer.logs',
+    'libreoffice.history',
+    'librewolf.backup',
+    'librewolf.cache',
+    'librewolf.cookies',
+    'librewolf.crash_reports',
+    'librewolf.dom',
+    'librewolf.forms',
+    'librewolf.passwords',
+    'librewolf.session_restore',
+    'librewolf.site_preferences',
+    'librewolf.url_history',
+    'librewolf.vacuum',
+    'microsoft_edge.cache',
+    'microsoft_edge.cookies',
+    'microsoft_edge.dom',
+    'microsoft_edge.form_history',
+    'microsoft_edge.history',
+    'microsoft_edge.passwords',
+    'microsoft_edge.search_engines',
+    'microsoft_edge.session',
+    'microsoft_edge.site_preferences',
+    'microsoft_edge.sync',
+    'microsoft_edge.vacuum',
+    'microsoft_office.debug_logs',
+    'microsoft_office.mru',
+    'openofficeorg.cache',
+    'openofficeorg.recent_documents',
+    'opera.cache',
+    'opera.cookies',
+    'opera.dom',
+    'opera.form_history',
+    'opera.history',
+    'opera.passwords',
+    'opera.session',
+    'opera.site_preferences',
+    'opera.vacuum',
+    'paint.mru',
+    'realplayer.cookies',
+    'realplayer.history',
+    'realplayer.logs',
+    'safari.cache',
+    'safari.cookies',
+    'safari.history',
+    'safari.vacuum',
+    'screenlets.logs',
+    'skype.chat_logs',
+    'skype.installers',
+    'slack.cache',
+    'slack.cookies',
+    'slack.history',
+    'slack.vacuum',
+    'system.clipboard',
+    'system.custom',
+    'system.logs',
+    'system.memory_dump',
+    'system.muicache',
+    'system.prefetch',
+    'system.recycle_bin',
+    'system.tmp',
+    'teamviewer.logs',
+    'teamviewer.mru',
+    'windows_explorer.mru',
+    'windows_explorer.recent_documents',
+    'windows_explorer.run',
+    'windows_explorer.search_history',
+    'windows_explorer.shellbags',
+    'windows_explorer.thumbnails',
+    'windows_media_player.cache',
+    'windows_media_player.mru',
+    'winrar.history',
+    'winrar.temp',
+    'winzip.mru',
+    'wordpad.mru',
+    'zoom.cache',
+    'zoom.logs',
+    'zoom.recordings',
+    'system.free_disk_space')
+
+
+
+    foreach ($c in $Cleaners) {
+
+        Write-Host "Cleaning Program: $c" -ForegroundColor Yellow
+        & $exe --clean $c 2>&1 | ForEach-Object { "$c`t$_" }
     }
-    Stop-Process -name explorer
-    # Quick access
-    remove-item "$env:APPDATA\Microsoft\Windows\Recent\AutomaticDestinations\f01b4d95cf55d32a.automaticDestinations-ms" -Force -ea SilentlyContinue } | Out-Null
-    
-# Browser cleaning
-Write-host "`t- Deleting Browser data:" -f yellow
-        
-function Remove-ChromiumCache {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$ProfilesPath,
-        [Parameter(Mandatory = $true)]
-        [String]$ProcessName)
-    $rootfolders = $env:LOCALAPPDATA, $env:APPDATA
-    $profilepath = join-path -Path $rootfolders[0] -ChildPath $ProfilesPath
-    if ((Test-Path $profilepath)) {
-        Write-host "`t    - Cleaning $processname.." -f yellow; 
-        if (Get-Process -Name $ProcessName -ErrorAction SilentlyContinue) {
-            Stop-process -Name $ProcessName -Force; Start-Sleep -s 3
-        }
-        foreach ($folder in $rootfolders) {
-            $subfolder = Join-path -Path $folder -ChildPath $ProfilesPath
-            if (test-path $subfolder) { Get-ChildItem $subfolder | Remove-item -Recurse -Force -ErrorAction SilentlyContinue }
-        }
-    }
-}
-    
-function Remove-GeckoCache {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$ProfilesPath,
-        [Parameter(Mandatory = $true)]
-        [String]$ProcessName)
-    
-    $rootfolders = $env:LOCALAPPDATA, $env:APPDATA
-    $profilepath = join-path -Path $rootfolders[1] -ChildPath $ProfilesPath
-    If ((Test-Path $profilepath)) {
-        Write-host "`t    - Cleaning $processname.." -f yellow; 
-        if (Get-Process -Name $ProcessName -ErrorAction SilentlyContinue) {
-            Stop-process -Name $ProcessName -Force; Start-Sleep -s 3
-        }
-        $profiles = $rootfolders | ForEach-Object { Join-Path -Path $_ -ChildPath $profilespath }
-        $profiles = (get-childitem $profiles).FullName | ForEach-Object { Get-ChildItem $_ | Remove-item -Recurse -Force -ErrorAction SilentlyContinue }
-    }
-}
-    
-# Internet Explorer
-start-job -Name "Internet Explorer" -ScriptBlock {
-    Write-host "`t- Cleaning Internet Explorer.." -f yellow
-    Get-Process | ? Name -match OneDrive | Stop-Process  -ErrorAction SilentlyContinue
-    Stop-Process -Name "iexplore" -ErrorAction SilentlyContinue
-    RunDll32.exe InetCpl.cpl, ClearMyTracksByProcess 1
-    Remove-Item -path "$($env:USERPROFILE)\AppData\Local\Microsoft\Windows\Temporary Internet Files\*" -Recurse -Force -EA SilentlyContinue
-    Remove-Item -path "$($env:USERPROFILE)\AppData\Local\Microsoft\Windows\INetCache\*" -Recurse -Force -EA SilentlyContinue 
-    $IEKeys = @(
-        "HKCU:\Software\Microsoft\Internet Explorer\TypedURLs"
-        "HKCU:\Software\Microsoft\Internet Explorer\TypedURLsTime"
-        "HKCU:\Software\Microsoft\Internet Explorer\TabbedBrowsing\NewTabPage"
-        "HKCU:\Software\Microsoft\Internet Explorer\Main\FeatureControl"
-        "HKCU:\Software\Microsoft\Windows\CurrentVersion\Ext\Stats")
-    foreach ($Key in $IEKeys) { if ((Test-Path $Key)) { remove-item $Key -Recurse -force -ea Ignore } } } | Out-Null
 
-# Microsoft Edge
-Remove-ChromiumCache -ProfilesPath "Microsoft\Edge\User Data\Default" -ProcessName "msedge"
-                        
-# Google Chrome
-Remove-ChromiumCache -ProfilesPath "Google\Chrome\User Data" -ProcessName "chrome"
-        
-# Firefox
-Remove-GeckoCache -ProfilesPath "Mozilla\Firefox\Profiles" -ProcessName "firefox"
-        
-# Librewolf
-Remove-GeckoCache -ProfilesPath "librewolf\Profiles" -ProcessName "librewolf"
-
-# Vivaldi
-Remove-ChromiumCache -ProfilesPath "Vivaldi\User Data" -ProcessName "vivaldi"
-        
-#Opera
-Remove-ChromiumCache -ProfilesPath "Opera Software\Opera Stable" -ProcessName "opera"
-       
-# Brave
-Remove-ChromiumCache -ProfilesPath "BraveSoftware\Brave-Browser" -ProcessName "brave"
-
-# Epic
-Remove-ChromiumCache -ProfilesPath "Epic Privacy Browser\User Data" -ProcessName "epic"
-
-# Opera GX
-Remove-ChromiumCache -ProfilesPath "Opera Software\Opera GX Stable" -ProcessName "opera"
-
-# Chromium
-Remove-ChromiumCache -ProfilesPath "Chromium\User Data" -ProcessName "chrome"
-                
-# Cleaning traces                 
-Write-host "`tCleaning traces:" -f yellow
-    
-# Cleanupdisk
-Write-host "`t    - Clean up disk.." -f yellow
-$path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
-If (!(Test-Path $path)) { New-Item -Path $path -Force | Out-Null }; 
-Set-ItemProperty -Path $path -Name "StateFlags001" -Type DWORD -Value 2 -Force | Out-Null
-Start-Process -FilePath CleanMgr.exe -ArgumentList ‘/sagerun:1’ -Wait
-Get-Process -Name cleanmgr, dismhost -ea SilentlyContinue | Wait-Process -Timeout 900
-
-# Clear eventlogs
-Write-host "`t    - Event Viewer.." -f yellow
-Get-EventLog -LogName * | % { Clear-EventLog $_.Log }
-Get-WinEvent -ListLog * | Where-Object { $PSItem.IsEnabled -eq $true -and $PSItem.RecordCount -gt 0 } | ForEach-Object -Process { [Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.ClearLog($PSItem.LogName) } 2> $null
-
-# Delete restore points
-Write-host "`t    - Restore point.." -f yellow
-vssadmin delete shadows /all | Out-Null
-Get-EventLog -LogName * | % { Clear-EventLog $_.Log }
-        
-# Delete console history
-Write-host "`t    - Clean up Console History.." -f yellow
-clear-history
-get-childitem "$($env:APPDATA)\Microsoft\Windows\PowerShell\PSReadLine\*history*" | remove-item -Force -ErrorAction SilentlyContinue
-Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Recurse -Force -Verbose -ErrorAction SilentlyContinue
-Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\WordWheelQuery" -Recurse -Force -Verbose -ErrorAction SilentlyContinue
-        
-# Make deleted files untraceable
-Write-host "`t    - Make deleted files unretrievable.. (This step will take LONG time)" -f yellow
-cipher /w:c:\
+    Remove-Item $zipFile -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item $extractFolder -Recurse -Force -ErrorAction SilentlyContinue

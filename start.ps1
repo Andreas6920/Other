@@ -56,11 +56,11 @@ do {
         10 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/InstallActionOne.ps1" | Invoke-Expression}
         11 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/delete-traces.ps1" | Invoke-Expression}
         12 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1" | Invoke-Expression}
-        13 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/WNetWatcher.ps1" | Invoke-Expression}
+        13 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Install-WNetWatcher.ps1" | Invoke-Expression; Install-WNetWatcher}
         14 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/SDI-Tool.ps1" | Invoke-Expression}
         15 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"  | Invoke-Expression}
         16 {Invoke-RestMethod "https://paste.ee/r/03ckOFke"  | Invoke-Expression}
-        17 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/WizTree.ps1" | Invoke-Expression}
+        17 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Install-WizTree.ps1" | Invoke-Expression; Install-WizTree}
         18 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/pcinfo.ps1" | Invoke-Expression}
         19 {iex "& { $(iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/spotx-official.github.io/main/run.ps1') } -confirm_uninstall_ms_spoti -confirm_spoti_recomended_over -podcasts_off -block_update_on -start_spoti -new_theme -adsections_off -lyrics_stat spotify"}
         20 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/TronScript.ps1" | Invoke-Expression}       
