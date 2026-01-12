@@ -17,7 +17,8 @@ $ErrorActionPreference = 'Stop'
 
 # Download to temp
     $zipFile = Join-Path $TempPath ([System.IO.Path]::GetFileName($FileUrl))
-    Invoke-WebRequest -Uri $FileUrl -OutFile $zipFile
+    #Invoke-WebRequest -Uri $FileUrl -OutFile $zipFile
+    (New-Object Net.WebClient).DownloadFile($FileUrl, $ZipFile)
 
 # Extract folder to desktop
     $extractFolder = Join-Path $DesktopPath ([System.IO.Path]::GetFileNameWithoutExtension($zipFile))

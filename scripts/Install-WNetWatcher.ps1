@@ -1,4 +1,4 @@
-
+function Install-WNetWatcher {
 # Configuration
 $Link = "https://www.nirsoft.net/utils/wnetwatcher-x64.zip"
 $FileName = "WNetWatcher.zip"
@@ -13,11 +13,11 @@ New-Item -ItemType Directory -Path $BaseTemp -Force | Out-Null
 # Download file
 Write-Host "`t- Downloading file..." -ForegroundColor Green
 try {
-    Invoke-WebRequest -Uri $Link -OutFile $TempZip -UseBasicParsing
-} catch {
+    #Invoke-WebRequest -Uri $Link -OutFile $TempZip -UseBasicParsing
+    (New-Object Net.WebClient).DownloadFile($url, $TempZip)} 
+catch {
     Write-Host "`t- Download failed: $($_.Exception.Message)" -ForegroundColor Red
-    exit 1
-}
+    exit 1}
 
 # Extract file
 Write-Host "`t- Extracting file..." -ForegroundColor Green
@@ -51,3 +51,4 @@ Write-Host "`t- Cleaning up temporary files..." -ForegroundColor Green
 Remove-Item -Path $TempZip -Force -ErrorAction SilentlyContinue
 
 Write-Host "`t- Operation completed successfully!" -ForegroundColor Green
+}
