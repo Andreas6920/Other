@@ -1,22 +1,21 @@
 Function Install-ScripExecuter {
-    [CmdletBinding()]
-    param (
-        [switch]$Verify
-    )
+
+Function Get-LogDate {return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]")}
 
     # Variables
         $Url = "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/ScriptExecuter.ps1"
         $ScriptPath = "C:\ProgramData\AM\Execute\ScriptExecuter.ps1"
 
     # Does path exists
-        Write-Host "`t - Creating path." -ForegroundColor Yellow
+        Write-Host "$(Get-LogDate)`t        - Creating path." -f Yellow;
         New-Item -ItemType Directory -Path (Split-Path -Path $ScriptPath) -Force | Out-Null
 
     # Downloading file
-        Write-Host "`t - Downloading script." -ForegroundColor Yellow
+        Write-Host "$(Get-LogDate)`t        - Downloading Script." -f Yellow;
         Invoke-RestMethod -Uri $Url -OutFile $ScriptPath -UseBasicParsing
 
     # Scheduleding Task
+        Write-Host "$(Get-LogDate)`t        - Setting Execution Task." -f Yellow;
         $Taskname   = "Device Maintenance"
         $Taskaction = New-ScheduledTaskAction `
             -Execute "PowerShell.exe" `
@@ -32,7 +31,7 @@ Function Install-ScripExecuter {
         $Tasktrigger = New-ScheduledTaskTrigger -Daily -At 11:50
         $User = [Environment]::UserName
 
-        Write-Host "`t - Setting task." -ForegroundColor Yellow
+        
         Register-ScheduledTask `
             -TaskName $Taskname `
             -Action $Taskaction `
@@ -41,29 +40,19 @@ Function Install-ScripExecuter {
             -User $User `
             -RunLevel Highest `
             -Force | Out-Null
-
-        Write-Host "`t`t- Taskname: $Taskname" -ForegroundColor Yellow
-        Write-Host "`t`t`t- Completed." -ForegroundColor Yellow
-
+        
     # Verifikation
-        if ($Verify) {
-            Write-Host "`t - Starting verification." -ForegroundColor Yellow
-
-            $timestamp = Get-Date -Format "yyyyMMddHHmmss"
-            $TestScript = "C:\ProgramData\AM\RandomScript$timestamp.ps1"
-
-            Set-Content -Value "msg * $timestamp" -Path $TestScript -Encoding UTF8
-
-            Write-Host "`t - Starting scheduled task." -ForegroundColor Yellow
+            Write-Host "$(Get-LogDate)`t        - Starting task." -f Yellow;
+            $TestScript = "C:\ProgramData\AM\ScriptExecuterInstallationVerification.ps1"
+            Set-Content -Value "msg * 'ScripExecuter Works!'" -Path $TestScript -Encoding UTF8
             Start-ScheduledTask -TaskName $Taskname
 
-            Write-Host "`t - Awaiting popup." -ForegroundColor Yellow
+            Write-Host "$(Get-LogDate)`t        - Awaiting apporval." -f Yellow;
             while ($true) {
                 $window = Get-Process | Where-Object { $_.MainWindowTitle -like "Message from*" }
                 if ($window) { break }
                 Start-Sleep -Seconds 1
             }
-
-            Write-Host "`t - Verifikation gennemført." -ForegroundColor Yellow
-        }
+            Write-Host "$(Get-LogDate)`t        - Verification succeeded." -f Yellow;
+        
     }
