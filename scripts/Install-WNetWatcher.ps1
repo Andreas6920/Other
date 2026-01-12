@@ -23,11 +23,10 @@ catch {
 Write-Host "`t- Extracting file..." -ForegroundColor Green
 try {
     Expand-Archive -Path $TempZip -DestinationPath $ExtractedFolder -Force
-    Write-Host "`t- Extraction successful to: $ExtractedFolder" -ForegroundColor Green
-} catch {
+    Write-Host "`t- Extraction successful to: $ExtractedFolder" -ForegroundColor Green} 
+catch {
     Write-Host "`t- Extraction failed: $($_.Exception.Message)" -ForegroundColor Red
-    exit 1
-}
+    exit 1}
 
 # Find executable in extracted folder
 $exe = Get-ChildItem -Path $ExtractedFolder -Filter "WNetWatcher*.exe" -File -Recurse | Select-Object -First 1
