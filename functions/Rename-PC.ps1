@@ -1,18 +1,13 @@
 # Reinsure admin rights
 If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     $Script = $MyInvocation.MyCommand.Path
-    Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass", "-File `"$Script`""
-}
+    Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass", "-File `"$Script`""}
 
-# Set execution rights
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
-# Timestamps for actions
-Function Get-LogDate { return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]") }
 
 # Definer navn
             # Klargøring
-                Write-Host "$(Get-LogDate)`t    Navngiver PC." -ForegroundColor Green
+                Write-Host "`t    Navngiver PC." -ForegroundColor Green
             # Modtager brugertastning
                 Write-Host "`t- Indtast Fornavn: " -nonewline -f yellow;
                 $Forename = Read-Host
@@ -40,4 +35,4 @@ Function Get-LogDate { return (Get-Date -f "[yyyy/MM/dd HH:mm:ss]") }
         $ThisPCDescription = Get-WmiObject -class Win32_OperatingSystem
         $ThisPCDescription.Description = $PCDescription
         $ThisPCDescription.put() | out-null
-        Write-Host "$(Get-LogDate)`t    Computeren navngives ved genstart." -ForegroundColor Green
+        Write-Host "`t    Computeren navngives ved genstart." -ForegroundColor Green
