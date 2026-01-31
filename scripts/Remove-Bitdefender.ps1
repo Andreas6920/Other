@@ -8,6 +8,6 @@ $Filepath = Join-Path $FolderPath -ChildPath $FileName
 Write-Host "`t`t`t - Creating Folder: $FolderPath"
 New-Item -Path $FolderPath -ItemType Directory -Force | Out-Null
 Write-Host "`t`t`t - Downloading File: $FileName"
-(New-Object net.webclient).Downloadfile($link, $Filepath )
+(New-Object net.webclient).Downloadfile($link, $Filepath)
 Write-Host "`t`t`t - Executing File: $FilePath"
 Start-Process -FilePath $FilePath

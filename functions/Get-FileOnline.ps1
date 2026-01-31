@@ -4,7 +4,7 @@
 Downloads a file from a specified link into a structured folder and can optionally open the folder or file after download.
 
 .DESCRIPTION
-Start-FileDownload downloads a file from an URL and stores it in a folder, created for the file.
+Get-FileOnline downloads a file from an URL and stores it in a folder, created for the file.
 The folder is created in a specified location such as Desktop, Temp, or ProgramData.
 !! NOTE: FileName must include the file extension, like: "Installer.msi", "Program.exe", "windows.iso" etc. !!
 
@@ -17,11 +17,11 @@ and or execute the downloaded file. PowerShell scripts (.ps1) are executed using
 dot-sourcing, while other file types are started as standard processes.
 
 .EXAMPLE
-Start-FileDownload -Link "https://winamp.com/Winamp-latest.exe" -FileName "Winamp.exe" -OpenFileAfterDownload
+Get-FileOnline -Link "https://winamp.com/Winamp-latest.exe" -FileName "Winamp.exe" -OpenFileAfterDownload
 - Downloads installation file and runs it.
 
 .EXAMPLE
-Start-FileDownload -Link "https://Microsoft.com/Windows11.iso" -FileName "Windows 11.exe" -OpenFolderAfterDownload
+Get-FileOnline -Link "https://Microsoft.com/Windows11.iso" -FileName "Windows 11.exe" -OpenFolderAfterDownload
 - Downloads iso file and opens the download folder created for the file.
 
 .NOTES
@@ -31,7 +31,7 @@ This function is intended for interactive use and simple automation scenarios.
 Link validation requires the endpoint to respond with an HTTP status code in the 200-299 range.
 
 #>
-function Start-FileDownload {
+function Get-FileOnline {
  
 
 
