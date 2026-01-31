@@ -1,4 +1,8 @@
-﻿# Set-ExecutionPolicy    
+﻿function Install-ZeroTier {
+
+
+
+# Set-ExecutionPolicy    
 Set-ExecutionPolicy Bypass -Scope Process -Force;
 $sys = [Environment]::GetFolderPath("ProgramFilesX86"), [Environment]::GetFolderPath("ProgramFiles")
 $check = Get-ChildItem $sys -Directory -Depth 0 | Where-Object { $_.name -eq "ZeroTier" }
@@ -27,3 +31,4 @@ $startup = [Environment]::GetFolderPath("Startup")
 $startup = Join-Path -Path $startup -ChildPath (Split-Path $shortcut -Leaf)
     
 Copy-Item $shortcut $startup
+}
