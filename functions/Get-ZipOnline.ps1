@@ -27,7 +27,7 @@ This parameter is mandatory and is not derived from the URL.
 .PARAMETER Location
 Specifies the base destination folder.
 Valid values are:
-- Temp
+- Temp ($TMP - if not exists - $TEMP)
 - Downloads
 - Desktop
 - Custom
@@ -153,8 +153,7 @@ function Get-ZipOnline {
                 $installerPath = Join-Path $env:TEMP (Split-Path $dlurl -Leaf)
                 (New-Object System.Net.WebClient).DownloadFile($dlurl, $installerPath)
                 Start-Process -FilePath $installerPath -ArgumentList "/S" -Verb RunAs -Wait
-                Remove-Item $installerPath -Force
-            }
+                Remove-Item $installerPath -Force}
 
             $7zip = (Get-ChildItem -Path "C:\Program Files\7-Zip\", "C:\Program Files (x86)\7-Zip\" `
                     -Recurse -Filter "7z.exe" -ErrorAction SilentlyContinue).FullName
@@ -184,8 +183,7 @@ function Get-ZipOnline {
         if ($OpenExtractedFile) {
             $Target = Get-ChildItem -Path $ExtractFolder -Recurse -Filter $OpenExtractedFile -ErrorAction SilentlyContinue | Select-Object -First 1
                 if ($Target) { Start-Process $Target.FullName }
-        else { Write-Warning "File '$OpenExtractedFile' not found in extracted content."}
-    }
+        else { Write-Warning "File '$OpenExtractedFile' not found in extracted content."}}
 
     # Output
     [PSCustomObject]@{
