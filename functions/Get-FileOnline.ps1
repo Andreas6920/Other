@@ -67,9 +67,7 @@ function Get-FileOnline {
     $BasePath = switch ($Location) {
         'Desktop'     { [Environment]::GetFolderPath('Desktop') }
         'Temp' { if ($env:TMP) { $env:TMP } else { $env:TEMP } }
-        'ProgramData' { $env:ProgramData }
-        default { if ($env:TMP) { $env:TMP } else { $env:TEMP } }
-    }
+        'ProgramData' { $env:ProgramData }}
 
     if ([string]::IsNullOrWhiteSpace($BasePath) -or -not (Test-Path -LiteralPath $BasePath)) {
         throw "Kunne ikke resolve Location '$Location' til en gyldig sti. Resolved BasePath: '$BasePath'"
