@@ -47,21 +47,21 @@ do {
         1 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression}
         2 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression}
         3 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression; Install-App -Name Office}
-        4 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Get-WindowsISO.ps1" | Invoke-Expression}
-        5 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-Activated.ps1" | Invoke-Expression; Get-Activated -Office}
-        6 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-Activated.ps1" | Invoke-Expression; Get-Activated -Windows}
+        4 {Invoke-RestMethod "https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1" | Invoke-Expression}
+        5 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedOffice.ps1" | Invoke-Expression}
+        6 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedWindows.ps1" | Invoke-Expression}
         7 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression}
         8 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-project.ps1" | Invoke-Expression}
         9 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/print_project/refs/heads/main/print-module.psm1"  | Invoke-Expression; Install-Printer -Alle -NavisionPrinter}
-        10 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/InstallActionOne.ps1" | Invoke-Expression}
-        11 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Delete-Traces.ps1" | Invoke-Expression}
-        12 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/zerotier.ps1" | Invoke-Expression}
-        13 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Install-WNetWatcher.ps1" | Invoke-Expression; Install-WNetWatcher}
+        10 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-ActionOne.ps1" | Invoke-Expression}
+        11 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Remove-Traces.ps1" | Invoke-Expression}
+        12 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-ZeroTier.ps1" | Invoke-Expression}
+        13 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-WNetWatcher.ps1" | Invoke-Expression; Install-WNetWatcher}
         14 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/SDI-Tool.ps1" | Invoke-Expression}
         15 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/ChromeDecrypter.ps1"  | Invoke-Expression}
         16 {Invoke-RestMethod "https://paste.ee/r/03ckOFke"  | Invoke-Expression}
-        17 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Install-WizTree.ps1" | Invoke-Expression; Install-WizTree}
-        18 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/Get-PCInfo.ps1" | Invoke-Expression}
+        17 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-WizTree.ps1" | Invoke-Expression; Install-WizTree}
+        18 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-PCInfo.ps1" | Invoke-Expression}
         19 {iex "& { $(iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/spotx-official.github.io/main/run.ps1') } -confirm_uninstall_ms_spoti -confirm_spoti_recomended_over -podcasts_off -block_update_on -start_spoti -new_theme -adsections_off -lyrics_stat spotify"}
         20 {Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/TronScript.ps1" | Invoke-Expression}       
         Default {}}

@@ -1,8 +1,5 @@
-function Install-WizTree {
-
-$ErrorActionPreference = 'Stop'
-
-# Konfiguration
+# Configuration
+    $ErrorActionPreference = 'Stop'
     $DownloadPage = 'https://diskanalyzer.com/download'
     $TempPath     = [System.IO.Path]::GetTempPath()
     $DesktopPath  = [Environment]::GetFolderPath('Desktop')
@@ -33,6 +30,3 @@ $ErrorActionPreference = 'Stop'
 
 # Clean up
     Remove-Item $zipFile -Force -ErrorAction SilentlyContinue | Out-Null
-
-
-}

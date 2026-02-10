@@ -1,38 +1,100 @@
-# Reinsure admin rights
-If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    $Script = $MyInvocation.MyCommand.Path
-    Start-Process powershell.exe -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass", "-File `"$Script`""}
+function Rename-PC {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$Name
+    )
 
+    function Normalize-NamePart {
+        param(
+            [Parameter(Mandatory)]
+            [string]$Value
+        )
 
+        $v = $Value.Trim()
 
-# Definer navn
-            # Klargøring
-                Write-Host "`t    Navngiver PC." -ForegroundColor Green
-            # Modtager brugertastning
-                Write-Host "`t- Indtast Fornavn: " -nonewline -f yellow;
-                $Forename = Read-Host
-                $Forename = $Forename.Replace('æ','a').Replace('ø','o').Replace('å','a').Replace(' ','')
-                Write-Host "`t- Indtast Efternavn: " -nonewline -f yellow;
-                $Lastname = Read-Host
-                $Lastname = $Lastname.Replace('æ','a').Replace('ø','o').Replace('å','a').Replace(' ','')
-            # COMPUTER NAVN
-                $PCName = "PC-"+$Forename.Substring(0,3).ToUpper()+$Lastname.Substring(0,3).ToUpper()
-            # COMPUTER BESKRIVELSE
-                if ($Lastname -notlike "*s"){$Lastname = $Lastname + "'s"}
-                else{$Lastname = $Lastname + "'"}
-                $Lastname = (Get-Culture).TextInfo.ToTitleCase($Lastname)
-                $Forename = (Get-Culture).TextInfo.ToTitleCase($Forename)
-                $PCDescription = $Forename+" "+$Lastname + " PC"
-        
-# Navngiv PC
-    # Omdøb PC
-        $WarningPreference = "SilentlyContinue"
-        Write-Host "`t`t- COMPUTERNAVN:`t`t$PCName" -f Yellow;
-        if($PCName -ne $env:COMPUTERNAME){Rename-computer -newname $PCName}
-    # Omdøb PC Beskrivelse
-        $WarningPreference = "SilentlyContinue"
-        Write-Host "`t`t- BESKRIVELSE:`t`t$PCDescription" -f Yellow;
-        $ThisPCDescription = Get-WmiObject -class Win32_OperatingSystem
-        $ThisPCDescription.Description = $PCDescription
-        $ThisPCDescription.put() | out-null
-        Write-Host "`t    Computeren navngives ved genstart." -ForegroundColor Green
+        # Remove spaces and common separators
+        $v = $v -replace "[\s\-]+", ""
+
+        # Replace Danish letters
+        $v = $v.Replace('æ','a').Replace('ø','o').Replace('å','a')
+        $v = $v.Replace('Æ','A').Replace('Ø','O').Replace('Å','A')
+
+        return $v
+    }
+
+    # Strategy 3: Use first 3 chars if available, otherwise use the whole value (no padding)
+    function Get-NamePrefix {
+        param(
+            [Parameter(Mandatory)]
+            [string]$Value
+        )
+
+        $v = $Value.ToUpper()
+
+        if ($v.Length -ge 3) { return $v.Substring(0,3) }
+        return $v
+    }
+
+    Write-Host "`t    Navngiver PC." -ForegroundColor Green
+
+    # Collect forename/lastname
+    if ([string]::IsNullOrWhiteSpace($Name)) {
+        Write-Host "`t- Indtast Fornavn: " -NoNewline -ForegroundColor Yellow
+        $Forename = Read-Host
+
+        Write-Host "`t- Indtast Efternavn: " -NoNewline -ForegroundColor Yellow
+        $Lastname = Read-Host
+    }
+    else {
+        $parts = $Name.Trim() -split "\s+"
+
+        if ($parts.Count -lt 2) {
+            throw "Rename-PC: -Name skal indeholde mindst fornavn og efternavn, fx 'Johanne Severinsen'."
+        }
+
+        $Forename = $parts[0]
+        $Lastname = $parts[-1]
+    }
+
+    $ForenameNorm = Normalize-NamePart -Value $Forename
+    $LastnameNorm = Normalize-NamePart -Value $Lastname
+
+    if ([string]::IsNullOrWhiteSpace($ForenameNorm) -or [string]::IsNullOrWhiteSpace($LastnameNorm)) {
+        throw "Rename-PC: Fornavn og efternavn må ikke være tomme efter normalisering."
+    }
+
+    # COMPUTER NAME
+    $PCName = "PC-" + (Get-NamePrefix -Value $ForenameNorm) + (Get-NamePrefix -Value $LastnameNorm)
+
+    # COMPUTER DESCRIPTION
+    $ti = (Get-Culture).TextInfo
+
+    $ForenameDisplay = $ti.ToTitleCase($ForenameNorm.ToLower())
+
+    $LastnameDisplay = $LastnameNorm
+    if ($LastnameDisplay -notlike "*s") { $LastnameDisplay = $LastnameDisplay + "'s" }
+    else { $LastnameDisplay = $LastnameDisplay + "'" }
+
+    $LastnameDisplay = $ti.ToTitleCase($LastnameDisplay.ToLower())
+
+    $PCDescription = "$ForenameDisplay $LastnameDisplay PC"
+
+    # Apply changes
+    $WarningPreference = "SilentlyContinue"
+
+    Write-Host "`t`t- COMPUTERNAVN:`t`t$PCName" -ForegroundColor Yellow
+    if ($PCName -ne $env:COMPUTERNAME) {
+        Rename-Computer -NewName $PCName -Force
+    }
+    else {
+        Write-Host "`t`t- Navn er allerede sat til $PCName" -ForegroundColor Green
+    }
+
+    Write-Host "`t`t- BESKRIVELSE:`t`t$PCDescription" -ForegroundColor Yellow
+    $ThisPCDescription = Get-WmiObject -Class Win32_OperatingSystem
+    $ThisPCDescription.Description = $PCDescription
+    $null = $ThisPCDescription.Put()
+
+    Write-Host "`t    Computeren navngives ved genstart." -ForegroundColor Green
+}
