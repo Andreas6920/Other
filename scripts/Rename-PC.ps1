@@ -36,14 +36,14 @@ function Rename-PC {
         return $v
     }
 
-    Write-Host "`t    Navngiver PC." -ForegroundColor Green
+    Write-Host "`tNavngiver PC." -ForegroundColor Green
 
     # Collect forename/lastname
     if ([string]::IsNullOrWhiteSpace($Name)) {
-        Write-Host "`t- Indtast Fornavn: " -NoNewline -ForegroundColor Yellow
+        Write-Host "`t    - Indtast Fornavn: " -NoNewline -ForegroundColor Yellow
         $Forename = Read-Host
 
-        Write-Host "`t- Indtast Efternavn: " -NoNewline -ForegroundColor Yellow
+        Write-Host "`t    - Indtast Efternavn: " -NoNewline -ForegroundColor Yellow
         $Lastname = Read-Host
     }
     else {
@@ -96,5 +96,5 @@ function Rename-PC {
     $ThisPCDescription.Description = $PCDescription
     $null = $ThisPCDescription.Put()
 
-    Write-Host "`t    Computeren navngives ved genstart." -ForegroundColor Green
+    Write-Host "`tComputeren navngives ved genstart." -ForegroundColor Green
 }
