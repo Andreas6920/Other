@@ -9,22 +9,29 @@ Function Add-Reg {
                 [string]$Type,
                 [Parameter(Mandatory=$true)]
                 [string]$Value    )
-        
 
-
-        
             try {
                 if (!(Test-Path $Path)) { New-Item -Path $Path -Force | Out-Null }
         
                 $CurrentValue = $null
+                
+                # If key path already exists, just continue
                 if (Get-ItemProperty -Path $Path -Name $Name -ErrorAction SilentlyContinue) {$CurrentValue = (Get-ItemPropertyValue -Path $Path -Name $Name -ErrorAction SilentlyContinue)}
         
-                if ($CurrentValue -ne $Value) {New-ItemProperty -Path $Path -Name $Name -PropertyType $Type -Value $Value -Force -ErrorAction Stop | Out-Null} }
+                # If key path does not exist, create it
+                if ($CurrentValue -ne $Value) {
+                    New-ItemProperty -Path $Path -Name $Name -PropertyType $Type -Value $Value -Force -ErrorAction Stop | Out-Null
+                    Write-Host "-             Setting '$Name' to '$Value'." -ForegroundColor Yellow} 
+                
+                # If key value is already set to demanded value, continue
+                else {Write-Host "-             '$Name' is already '$Value'."}}
 
             catch {
-                if ($_.Exception.GetType().Name -eq "UnauthorizedAccessException") {
-                    # Undertrykker denne type fejl
-                    Write-Host "`t            - Access denied to modify '$Name'." -ForegroundColor Red}
-                else {Write-Host "`t            - ERROR - cannot modify '$Name': $_" -ForegroundColor Red}}
-        }
+                # If access denied to registry path
+                if ($_.Exception.GetType().Name -eq "UnauthorizedAccessException"){
+                    Write-Host "-             Access denied to modify '$Name'." -ForegroundColor Yellow} 
+                
+                # If something else fails
+                else {
+                    Write-Text "- ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
         
