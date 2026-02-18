@@ -23,17 +23,17 @@ Function Add-Reg {
                 # If key path does not exist, create it
                 if ($CurrentValue -ne $Value) {
                     New-ItemProperty -Path $Path -Name $Name -PropertyType $Type -Value $Value -Force -ErrorAction Stop | Out-Null
-                    Write-Host "$Timestamp               - Setting '$Name' to '$Value'." -ForegroundColor Yellow} 
+                        Write-Host "$Timestamp               " -NoNewline; Write-Host "- Setting '$Name' to '$Value'." -ForegroundColor Yellow} 
                 
                 # If key value is already set to demanded value, continue
-                else {Write-Host "$Timestamp               - '$Name' is already '$Value'."}}
+                else {Write-Host "$Timestamp               " -NoNewline; Write-Host "- '$Name' is already '$Value'." -ForegroundColor DarkYellow}}
 
             catch {
                 # If access denied to registry path
                 if ($_.Exception.GetType().Name -eq "UnauthorizedAccessException"){
-                    Write-Host "$Timestamp               - Access denied to modify '$Name'." -ForegroundColor Yellow} 
+                    Write-Host "$Timestamp               " -NoNewline; Write-Host "- Access denied to modify '$Name'." -ForegroundColor Yellow} 
                 
                 # If something else fails
                 else {
-                    Write-Text "$Timestamp               - ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
+                    Write-Host "$Timestamp               " -NoNewline; Write-Text "- ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
         
