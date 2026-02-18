@@ -32,31 +32,53 @@ function Write-Text {
         [string]$HeaderType,
 
         [Parameter(Mandatory = $true)]
-        [string]$Text
+        [string]$Text,
+
+        [Parameter(Mandatory = $false)]
+        [ConsoleColor]$EnforceColor
     )
 
-    $Timestamp = Get-Date -f "[yyyy/MM/dd HH:mm:ss]"
+    $Timestamp = Get-Date -Format "[yyyy/MM/dd HH:mm:ss]"
 
     switch ($HeaderType) {
+
         "1" {
-            Write-Host "$Timestamp`t" -NoNewline
-            Write-Host $Text.ToUpper() -ForegroundColor Green
+            $DefaultColor = "Green"
+            $Indent = ""
+            $OutputText = $Text.ToUpper()
         }
+
         "2" {
-            Write-Host "$Timestamp`t    " -NoNewline
-            Write-Host $Text -ForegroundColor Green
+            $DefaultColor = "Green"
+            $Indent = "    "
+            $OutputText = $Text
         }
+
         "3" {
-            Write-Host "$Timestamp`t        " -NoNewline
-            Write-Host $Text -ForegroundColor Yellow
+            $DefaultColor = "Yellow"
+            $Indent = "        "
+            $OutputText = $Text
         }
+
         "4" {
-            Write-Host "$Timestamp`t            " -NoNewline
-            Write-Host $Text -ForegroundColor DarkYellow
+            $DefaultColor = "DarkYellow"
+            $Indent = "            "
+            $OutputText = $Text
         }
+
         default {
-            Write-Host "$Timestamp`t" -NoNewline
-            Write-Host "Invalid HeaderType provided." -ForegroundColor Red
+            $DefaultColor = "Red"
+            $Indent = ""
+            $OutputText = "Invalid HeaderType provided."
         }
     }
+
+    $ColorToUse = if ($PSBoundParameters.ContainsKey("EnforceColor")) {
+        $EnforceColor
+    } else {
+        $DefaultColor
+    }
+
+    Write-Host "$Timestamp`t$Indent" -NoNewline
+    Write-Host $OutputText -ForegroundColor $ColorToUse
 }
