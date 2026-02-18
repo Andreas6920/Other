@@ -50,33 +50,23 @@ Specifies a file name to locate inside the extracted folder.
 The function performs a recursive search and opens the first match found.
 
 .EXAMPLE
-Get-ZipOnline `
-    -Link "https://example.com/tools.zip" `
-    -ZipName "tools.zip"
+Get-ZipOnline -Link "https://example.com/tools.zip" -ZipName "tools.zip"
 
 Downloads tools.zip to the Temp folder and extracts it.
 
 .EXAMPLE
-Get-ZipOnline `
-    -Link "https://example.com/package.7z" `
-    -ZipName "package.7z" `
-    -OpenZipFolder
+Get-ZipOnline -Link "https://example.com/package.7z" -ZipName "package.7z" -OpenZipFolder
 
 Downloads and extracts a 7z archive using 7-Zip and opens the extracted folder.
 
 .EXAMPLE
-Get-ZipOnline `
-    -Link "https://example.com/secure.zip" `
-    -ZipName "secure.zip" `
-    -Password "Secret123" `
-    -OpenExtractedFile "setup.exe"
+Get-ZipOnline -Link "https://example.com/secure.zip" -ZipName "secure.zip" -Password "Secret123" -OpenExtractedFile "setup.exe"
 
 Downloads an encrypted archive, extracts it using 7-Zip, recursively searches
 for setup.exe, and opens it.
 
 .NOTES
-- Uses System.Net.WebClient for download to maintain compatibility with
-  legacy scripts and environments.
+- Uses System.Net.WebClient for download to maintain compatibility with legacy scripts and environments.
 - 7-Zip is installed automatically if required.
 - Recursive file search opens the first matching result found.
 
