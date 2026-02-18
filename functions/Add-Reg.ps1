@@ -35,5 +35,5 @@ Function Add-Reg {
                 
                 # If something else fails
                 else {
-                    Write-Host "$Timestamp               " -NoNewline; Write-Text "- ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
+                    Write-Host "$Timestamp               " -NoNewline; Write-Host "- ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
         
