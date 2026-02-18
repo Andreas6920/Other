@@ -10,6 +10,8 @@ Function Add-Reg {
                 [Parameter(Mandatory=$true)]
                 [string]$Value    )
 
+                $Timestamp = Get-Date -Format "[yyyy/MM/dd HH:mm:ss]"
+
             try {
                 if (!(Test-Path $Path)) { New-Item -Path $Path -Force | Out-Null }
         
@@ -33,5 +35,5 @@ Function Add-Reg {
                 
                 # If something else fails
                 else {
-                    Write-Text "- ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
+                    Write-Text "-$Timestamp ERROR: Cannot modify '$Name': $_" -ForegroundColor Red}}}
         
