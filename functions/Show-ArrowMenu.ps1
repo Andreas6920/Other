@@ -18,6 +18,7 @@ function Show-ArrowMenu {
             Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select." -ForegroundColor Cyan
             Write-Host "`n"
             Write-Host "============================================================================="
+            Write-Host ""
         } else {
             Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select." -ForegroundColor DarkGray
         }
