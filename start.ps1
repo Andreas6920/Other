@@ -35,7 +35,7 @@ $menuItems = @(
                 Remove-Item -LiteralPath $tempMenuScript -Force -ErrorAction SilentlyContinue
             }
         }
-    }; Executed = $false }
+    }; Executed = $false; SkipPause = $true }
     @{ Name = "Module: Windows-Optimizer"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Module: Windows-Server-Automator"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install Microsoft Office 2016 Professional Retail"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression; Install-App -Name Office }; Executed = $false }
@@ -75,6 +75,8 @@ while ($true) {
     & $selectedItem.Action
     $selectedItem.Executed = $true
 
-    Write-Host "`nPress any key to return to the menu..." -ForegroundColor Gray
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    if (-not $selectedItem.SkipPause) {
+        Write-Host "`nPress any key to return to the menu..." -ForegroundColor Gray
+        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    }
 }
