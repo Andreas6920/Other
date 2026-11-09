@@ -15,16 +15,20 @@ function Show-ArrowMenu {
             Write-Host $Banner.TrimEnd() -ForegroundColor Blue
             Write-Host "`n"
             Write-Host "Developer: Andreas Mouritsen | Github: https://github.com/andreas6920"
+            Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select."
             Write-Host "============================================================================="
+        } else {
+            Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select." -ForegroundColor DarkGray
         }
-        Write-Host $Title -ForegroundColor Gray
-        Write-Host "Use Up/Down Arrow keys to navigate, Enter to select.`n" -ForegroundColor DarkGray
+        if ($Title) {
+            Write-Host $Title -ForegroundColor Gray
+        }
 
         for ($index = 0; $index -lt $MenuItems.Count; $index++) {
             $itemText = $MenuItems[$index].Name
             if ($index -eq $selectedIndex) {
                 $label = ("> {0} " -f $itemText).PadRight(58)
-                Write-Host $label -ForegroundColor Black -BackgroundColor Green
+                Write-Host $label -ForegroundColor Black -BackgroundColor Yellow
             } elseif ($MenuItems[$index].Executed) {
                 Write-Host "  $itemText" -ForegroundColor DarkGray
             } else {

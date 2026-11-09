@@ -70,7 +70,7 @@ $menuItems = @(
 )
 
 while ($true) {
-    $selectionIndex = Show-ArrowMenu -Title "PowerShell Toolkit Runner" -MenuItems $menuItems -Banner $mainMenuBanner
+    $selectionIndex = Show-ArrowMenu -Title "" -MenuItems $menuItems -Banner $mainMenuBanner
     $selectedItem = $menuItems[$selectionIndex]
 
     if ($selectedItem.Name -eq "Exit") { break }
