@@ -14,7 +14,7 @@ function Show-ArrowMenu {
             Write-Host "`n"
             Write-Host $Banner.TrimEnd() -ForegroundColor Blue
             Write-Host "`n"
-            Write-Host "Developer: Andreas6920 | Github: https://github.com/andreas6920"
+            Write-Host "Developer: Andreas Mouritsen | Github: https://github.com/andreas6920"
             Write-Host "============================================================================="
         }
         Write-Host $Title -ForegroundColor Gray
