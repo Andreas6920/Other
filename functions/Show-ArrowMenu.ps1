@@ -12,11 +12,12 @@ function Show-ArrowMenu {
         Clear-Host
         if ($Banner) {
             Write-Host "`n"
-            Write-Host $Banner.TrimEnd() -ForegroundColor Blue
+            Write-Host $Banner.TrimEnd() -ForegroundColor Yellow
             Write-Host "`n"
             Write-Host "Developer: Andreas Mouritsen | Github: https://github.com/andreas6920"
-            Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select."
+            Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select." -ForegroundColor Yellow
             Write-Host "============================================================================="
+            Write-Host "`n"
         } else {
             Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select." -ForegroundColor DarkGray
         }
