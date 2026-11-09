@@ -16,7 +16,7 @@ function Show-ArrowMenu {
             Write-Host "`n"
             Write-Host "Developer: Andreas Mouritsen | Github: https://github.com/andreas6920"
             Write-Host "TIP: Use Up/Down Arrow keys to navigate, Enter to select." -ForegroundColor Cyan
-            Write-Host "`n"
+            Write-Host ""
             Write-Host "============================================================================="
             Write-Host ""
         } else {
