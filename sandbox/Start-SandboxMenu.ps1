@@ -40,7 +40,11 @@ if (-not $appScripts) { throw 'No Install-*.ps1 scripts were found in the Sandbo
 $menuItems = @(
     foreach ($appScript in $appScripts) {
         $scriptName = $appScript.Name
-        $displayName = [IO.Path]::GetFileNameWithoutExtension($scriptName) -creplace '^Install-', '' -creplace '(?<=[a-z0-9])(?=[A-Z])', ' '
+        $displayName = if ($scriptName -eq 'Install-WindowsStore.ps1') {
+            'Install Windows Store'
+        } else {
+            [IO.Path]::GetFileNameWithoutExtension($scriptName) -creplace '^Install-', '' -creplace '(?<=[a-z0-9])(?=[A-Z])', ' '
+        }
         @{
             Name = $displayName
             ScriptPath = $appScript.ScriptPath
