@@ -64,7 +64,6 @@ $menuItems = @(
     @{ Name = "Deployment Script"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Deployment Script, Project"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-project.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Printer Script, Project"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/print_project/refs/heads/main/print-module.psm1" | Invoke-Expression; Install-Printer -Alle -NavisionPrinter }; Executed = $false }
-    @{ Name = "Action1, Project"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-ActionOne.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Delete digital footprint"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Remove-Traces.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install Zero Tier"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-ZeroTier.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Nirsoft IP Scanner"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-WNetWatcher.ps1" | Invoke-Expression; Install-WNetWatcher }; Executed = $false }
