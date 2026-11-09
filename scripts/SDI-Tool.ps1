@@ -18,21 +18,23 @@ New-Item -ItemType Directory -Path $ExtractedFolder | Out-Null
 Write-Host "`t-  Downloading file..." -ForegroundColor Green
 (New-Object net.webclient).Downloadfile("$DownloadLink", "$TempFolder"); 
 
-# File Extraction
-    
-    # Reliant on 7zip
-    $process = "$env:ProgramFiles\7-Zip\7z.exe"
+# Install and load 7Zip4PowerShell without interactive NuGet prompts
+if (-not (Get-Module -Name 7Zip4PowerShell)) {
+    if (-not (Get-Module -ListAvailable -Name 7Zip4PowerShell)) {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-    # Requires 7zip - makes sure it's on the system
-    if(-not(test-path $process)){
-    $dlurl = 'https://7-zip.org/' + (Invoke-WebRequest -UseBasicParsing -Uri 'https://7-zip.org/' | Select-Object -ExpandProperty Links | Where-Object {($_.outerHTML -match 'Download')-and ($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} | Select-Object -First 1 | Select-Object -ExpandProperty href)
-    $installerPath = Join-Path $env:TEMP (Split-Path $dlurl -Leaf)
-    Invoke-WebRequest $dlurl -OutFile $installerPath
-    Start-Process -FilePath $installerPath -Args "/S" -Verb RunAs -Wait
-    Remove-Item $installerPath} 
+        if (-not (Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue)) {
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force -Confirm:$false -ErrorAction Stop | Out-Null
+        }
+
+        Install-Module -Name 7Zip4PowerShell -Repository PSGallery -Scope CurrentUser -Force -Confirm:$false -ErrorAction Stop | Out-Null
+    }
+
+    Import-Module -Name 7Zip4PowerShell -ErrorAction Stop
+}
 
 Write-Host "`t-  Extracting file" -ForegroundColor Green;
-Start-Process $process -ArgumentList "x $TempFolder -o$ExtractedFolder" -Verb RunAs -Wait; Start-Sleep -S 3
+Expand-7Zip -ArchiveFileName $TempFolder -TargetPath $ExtractedFolder -ErrorAction Stop
 
 # Execute program
     Write-Host "`t-  Copying shortcut to your desktop.." -ForegroundColor Green;

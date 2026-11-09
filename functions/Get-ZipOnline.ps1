@@ -9,10 +9,10 @@ named after the archive file (without extension).
 
 The extraction method is determined automatically:
 - Native Expand-Archive is used for standard .zip files without a password.
-- 7-Zip is used if the archive is not a .zip file or if a password is provided.
+- 7Zip4PowerShell is used if the archive is not a .zip file or if a password is provided.
 
-If 7-Zip is not installed, the function will download and install it silently
-using the official installer.
+7Zip4PowerShell and its NuGet provider are installed silently for the current user
+when needed.
 
 The function also supports opening the extracted folder or locating and opening
 a specific file inside the extracted content using a recursive search.
@@ -67,11 +67,27 @@ for setup.exe, and opens it.
 
 .NOTES
 - Uses System.Net.WebClient for download to maintain compatibility with legacy scripts and environments.
-- 7-Zip is installed automatically if required.
+- 7Zip4PowerShell is installed automatically if required.
 - Recursive file search opens the first matching result found.
 
 #>
 
+
+function Import-7Zip4PowerShell {
+    if (Get-Module -Name 7Zip4PowerShell) { return }
+
+    if (-not (Get-Module -ListAvailable -Name 7Zip4PowerShell)) {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
+        if (-not (Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue)) {
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force -Confirm:$false -ErrorAction Stop | Out-Null
+        }
+
+        Install-Module -Name 7Zip4PowerShell -Repository PSGallery -Scope CurrentUser -Force -Confirm:$false -ErrorAction Stop | Out-Null
+    }
+
+    Import-Module -Name 7Zip4PowerShell -ErrorAction Stop
+}
 
 function Get-ZipOnline {
     [CmdletBinding()]
@@ -95,8 +111,8 @@ function Get-ZipOnline {
     )
 
     # Resolve base path
-    switch ($Location) {
-        "Temp"      { if ($env:TMP) { $env:TMP } else { $env:TEMP } }
+    $BasePath = switch ($Location) {
+        "Temp"      { if ($env:TMP) { $env:TMP } elseif ($env:TEMP) { $env:TEMP } else { [IO.Path]::GetTempPath() } }
         "Downloads" { $BasePath = [Environment]::GetFolderPath("Downloads") }
         "Desktop"   { $BasePath = [Environment]::GetFolderPath("Desktop") }
         "Custom"    {
@@ -109,60 +125,32 @@ function Get-ZipOnline {
     $ZipPath       = Join-Path $BasePath $ZipName
     $ExtractFolder = Join-Path $BasePath ([IO.Path]::GetFileNameWithoutExtension($ZipName))
 
-    # Create folder for extraction
-    if (-not (Test-Path $ExtractFolder)) { New-Item -ItemType Directory -Path $ExtractFolder -Force | Out-Null}
+    if (Test-Path -LiteralPath $ExtractFolder) {
+        $ExtractFolder = Join-Path $BasePath ("{0}_{1}" -f [IO.Path]::GetFileNameWithoutExtension($ZipName), [guid]::NewGuid().ToString('N'))
+    }
+    New-Item -ItemType Directory -Path $ExtractFolder -Force | Out-Null
 
     # Download file from link
-    try {(New-Object net.webclient).Downloadfile($link, $ZipPath)}
-    finally {if ($wc) { $wc.Dispose() }}
+    $wc = New-Object net.webclient
+    try { $wc.DownloadFile($Link, $ZipPath) }
+    finally { $wc.Dispose() }
 
     # if not plain and simple operation, use 7zip
     $IsZip  = $ZipName -match '\.zip$'
-    $Use7Zip = (-not $IsZip) -or $Password
+    $Use7Zip = (-not $IsZip) -or -not [string]::IsNullOrEmpty($Password)
 
-        # Determined to use 7zip
-        if ($Use7Zip) {
-
-            # Locate or install 7-Zip (your method)
-            $7zip = (Get-ChildItem -Path "C:\Program Files\7-Zip\", "C:\Program Files (x86)\7-Zip\" `
-                    -Recurse -Filter "7z.exe" -ErrorAction SilentlyContinue).FullName
-
-            # If 7zip is not installed - install it
-            if (-not $7zip) {
-                $dlurl = 'https://7-zip.org/' + (
-                    Invoke-WebRequest -UseBasicParsing -Uri 'https://7-zip.org/' |
-                    Select-Object -ExpandProperty Links |
-                    Where-Object {
-                        ($_.outerHTML -match 'Download') -and
-                        ($_.href -like "a/*") -and
-                        ($_.href -like "*-x64.exe")
-                    } |
-                    Select-Object -First 1 -ExpandProperty href
-                )
-
-                $installerPath = Join-Path $env:TEMP (Split-Path $dlurl -Leaf)
-                (New-Object System.Net.WebClient).DownloadFile($dlurl, $installerPath)
-                Start-Process -FilePath $installerPath -ArgumentList "/S" -Verb RunAs -Wait
-                Remove-Item $installerPath -Force}
-
-            $7zip = (Get-ChildItem -Path "C:\Program Files\7-Zip\", "C:\Program Files (x86)\7-Zip\" `
-                    -Recurse -Filter "7z.exe" -ErrorAction SilentlyContinue).FullName
-
-            if (-not $7zip) { throw "7-Zip could not be located."}
-
-            $Arguments = @(
-                "x"
-                "`"$ZipPath`""
-                "-o`"$ExtractFolder`""
-                "-y"
-            )
-
-            if ($Password) { $Arguments += "-p$Password"}
-
-            Start-Process -FilePath $7zip -ArgumentList $Arguments -Wait -NoNewWindow}
+    if ($Use7Zip) {
+        Import-7Zip4PowerShell
+        $ExpandParameters = @{
+            ArchiveFileName = $ZipPath
+            TargetPath = $ExtractFolder
+            ErrorAction = 'Stop'
+        }
+        if ($Password) { $ExpandParameters.Password = $Password }
+        Expand-7Zip @ExpandParameters
+    }
         
-        # Determined to use standard Microsoft function
-        else { Expand-Archive -Path $ZipPath -DestinationPath $ExtractFolder -Force }
+    else { Expand-Archive -Path $ZipPath -DestinationPath $ExtractFolder -ErrorAction Stop }
 
     # Post actions
 

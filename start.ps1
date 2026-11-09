@@ -53,11 +53,12 @@ function Show-ArrowMenu {
     return $selectedIndex
 }
 
+$ScriptRoot = $PSScriptRoot
 $menuItems = @(
     @{ Name = "Module: Windows-Optimizer"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Module: Windows-Server-Automator"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install Microsoft Office 2016 Professional Retail"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression; Install-App -Name Office }; Executed = $false }
-    @{ Name = "Download Windows"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1" | Invoke-Expression }; Executed = $false }
+    @{ Name = "Download Windows"; Action = { & (Join-Path $ScriptRoot "scripts\Get-WindowsISO.ps1") }; Executed = $false }
     @{ Name = "Activate Microsoft Office"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedOffice.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Activate Windows"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedWindows.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Deployment Script"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression }; Executed = $false }
