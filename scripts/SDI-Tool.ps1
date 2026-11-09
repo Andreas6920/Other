@@ -1,7 +1,14 @@
 # Find URL on the newest version of SDI-Tool
 $Url = "https://sdi-tool.org/download/"
-$DownloadLink = (Invoke-WebRequest -Uri $url -UseBasicParsing).Links | Select-Object -ExpandProperty href | Where-Object { $_ -match "driveroff\.net" -and $_ -match "/drv/" } | Sort-Object -Unique[0]
-$Version = (Split-Path $DownloadLink -Leaf).Replace("SDI_","Version: ").Replace(".7z","")
+$DownloadPage = Invoke-WebRequest -Uri $Url -UseBasicParsing -ErrorAction Stop
+$DownloadLink = $DownloadPage.Links |
+    ForEach-Object { $_.href } |
+    Where-Object { $_ -match '(^|/)SDI_[^/]+\.7z$' } |
+    Select-Object -First 1
+if (-not $DownloadLink) { throw "Could not find an SDI .7z download link on $Url" }
+$DownloadLink = ([uri]::new([uri]$Url, [string]$DownloadLink)).AbsoluteUri
+$DownloadFileName = [IO.Path]::GetFileName(([uri]$DownloadLink).AbsolutePath)
+$Version = ([IO.Path]::GetFileNameWithoutExtension($DownloadFileName)).Replace("SDI_", "Version: ")
 Write-Host "`t-  Searching for newest update:" -ForegroundColor Green; Start-Sleep -S 2
 Write-Host "`t`t - `t$Version" -ForegroundColor Green
 
@@ -38,7 +45,8 @@ Expand-7Zip -ArchiveFileName $TempFolder -TargetPath $ExtractedFolder -ErrorActi
 
 # Execute program
     Write-Host "`t-  Copying shortcut to your desktop.." -ForegroundColor Green;
-    $location = (Get-ChildItem $ExtractedFolder | Where-Object {$_.Name -match 64})
+    $location = Get-ChildItem -LiteralPath $ExtractedFolder | Where-Object { $_.Name -match '64' } | Select-Object -First 1
+    if (-not $location) { throw "Could not find the 64-bit SDI application in $ExtractedFolder" }
     $shortcut = join-path ([Environment]::GetFolderPath("Desktop")) -ChildPath $location.basename
     Copy-Item -Path $location.FullName -Destination ([Environment]::GetFolderPath("Desktop"))
 Start-Process $shortcut
