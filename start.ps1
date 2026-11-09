@@ -12,53 +12,35 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # TLS upgrade
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
-# Menu starts
-function Show-ArrowMenu {
-    param(
-        [string]$Title = "Select an option:",
-        [array]$MenuItems
-    )
-
-    $selectedIndex = 0
-    try { [Console]::CursorVisible = $false } catch {}
-
-    while ($true) {
-        Clear-Host
-        Write-Host $Title -ForegroundColor Gray
-        Write-Host "Use Up/Down Arrow keys to navigate, Enter to select.`n" -ForegroundColor DarkGray
-
-        for ($index = 0; $index -lt $MenuItems.Count; $index++) {
-            $itemText = $MenuItems[$index].Name
-            if ($index -eq $selectedIndex) {
-                $label = ("> {0} " -f $itemText).PadRight(58)
-                Write-Host $label -ForegroundColor Black -BackgroundColor Green
-            } elseif ($MenuItems[$index].Executed) {
-                Write-Host "  $itemText" -ForegroundColor DarkGray
-            } else {
-                Write-Host "  $itemText"
-            }
-        }
-
-        $keyInfo = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        switch ($keyInfo.VirtualKeyCode) {
-            38 { if ($selectedIndex -gt 0) { $selectedIndex-- } }
-            40 { if ($selectedIndex -lt $MenuItems.Count - 1) { $selectedIndex++ } }
-            13 { break }
-        }
-
-        if ($keyInfo.VirtualKeyCode -eq 13) { break }
-    }
-
-    try { [Console]::CursorVisible = $true } catch {}
-    return $selectedIndex
-}
-
 $ScriptRoot = $PSScriptRoot
+$RepoRawRoot = "https://raw.githubusercontent.com/Andreas6920/Other/main"
+$MenuHelperPath = if ($ScriptRoot) { Join-Path $ScriptRoot "functions\Show-ArrowMenu.ps1" } else { $null }
+if ($MenuHelperPath -and (Test-Path -LiteralPath $MenuHelperPath)) {
+    . $MenuHelperPath
+} else {
+    $MenuHelper = Invoke-RestMethod "$RepoRawRoot/functions/Show-ArrowMenu.ps1"
+    . ([scriptblock]::Create([string]$MenuHelper))
+}
 $menuItems = @(
+    @{ Name = "Windows Sandbox tools"; Action = {
+        $sandboxMenuPath = if ($ScriptRoot) { Join-Path $ScriptRoot "sandbox\Start-SandboxMenu.ps1" } else { $null }
+        if ($sandboxMenuPath -and (Test-Path -LiteralPath $sandboxMenuPath)) {
+            & $sandboxMenuPath
+        } else {
+            Invoke-Expression (Invoke-RestMethod "$RepoRawRoot/sandbox/Start-SandboxMenu.ps1")
+        }
+    }; Executed = $false }
     @{ Name = "Module: Windows-Optimizer"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Module: Windows-Server-Automator"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install Microsoft Office 2016 Professional Retail"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression; Install-App -Name Office }; Executed = $false }
-    @{ Name = "Download Windows"; Action = { & (Join-Path $ScriptRoot "scripts\Get-WindowsISO.ps1") }; Executed = $false }
+    @{ Name = "Download Windows"; Action = {
+        $isoScriptPath = if ($ScriptRoot) { Join-Path $ScriptRoot "scripts\Get-WindowsISO.ps1" } else { $null }
+        if ($isoScriptPath -and (Test-Path -LiteralPath $isoScriptPath)) {
+            & $isoScriptPath
+        } else {
+            Invoke-Expression (Invoke-RestMethod "$RepoRawRoot/scripts/Get-WindowsISO.ps1")
+        }
+    }; Executed = $false }
     @{ Name = "Activate Microsoft Office"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedOffice.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Activate Windows"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedWindows.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Deployment Script"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/deploy-project/refs/heads/main/deployment-general.ps1" | Invoke-Expression }; Executed = $false }

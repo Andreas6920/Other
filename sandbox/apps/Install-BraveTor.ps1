@@ -35,7 +35,6 @@ if (-not $foundPath) {
         Start-Sleep -Seconds 5
     }
 
-    # Re-evaluate path after installation
     foreach ($path in $possiblePaths) {
         if (Test-Path $path) {
             $foundPath = $path
@@ -46,7 +45,6 @@ if (-not $foundPath) {
     Write-Host "Brave er installeret: $foundPath"
 }
 
-# Remove old desktop shortcuts
 $shortcutPaths = @(
     "$env:PUBLIC\Desktop\Brave.lnk",
     "$env:USERPROFILE\Desktop\Brave.lnk"
@@ -59,7 +57,6 @@ foreach ($shortcut in $shortcutPaths) {
     }
 }
 
-# Create new TOR shortcut if a valid path exists
 if ($foundPath) {
     Write-Host "Opretter genvej"
 
