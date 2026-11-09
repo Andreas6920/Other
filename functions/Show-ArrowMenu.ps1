@@ -1,7 +1,8 @@
 function Show-ArrowMenu {
     param(
         [string]$Title = "Select an option:",
-        [array]$MenuItems
+        [array]$MenuItems,
+        [string]$Banner = ""
     )
 
     $selectedIndex = 0
@@ -9,6 +10,10 @@ function Show-ArrowMenu {
 
     while ($true) {
         Clear-Host
+        if ($Banner) {
+            Write-Host $Banner.TrimEnd() -ForegroundColor Cyan
+            Write-Host
+        }
         Write-Host $Title -ForegroundColor Gray
         Write-Host "Use Up/Down Arrow keys to navigate, Enter to select.`n" -ForegroundColor DarkGray
 

@@ -14,6 +14,12 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     
 $ScriptRoot = $PSScriptRoot
 $RepoRawRoot = "https://raw.githubusercontent.com/Andreas6920/Other/main"
+$mainMenuBannerPath = if ($ScriptRoot) { Join-Path $ScriptRoot "functions\ascii-toolbox.txt" } else { $null }
+if ($mainMenuBannerPath -and (Test-Path -LiteralPath $mainMenuBannerPath)) {
+    $mainMenuBanner = Get-Content -LiteralPath $mainMenuBannerPath -Raw
+} else {
+    $mainMenuBanner = Invoke-RestMethod "$RepoRawRoot/functions/ascii-toolbox.txt"
+}
 $MenuHelperPath = if ($ScriptRoot) { Join-Path $ScriptRoot "functions\Show-ArrowMenu.ps1" } else { $null }
 if ($MenuHelperPath -and (Test-Path -LiteralPath $MenuHelperPath)) {
     . $MenuHelperPath
@@ -64,7 +70,7 @@ $menuItems = @(
 )
 
 while ($true) {
-    $selectionIndex = Show-ArrowMenu -Title "PowerShell Toolkit Runner" -MenuItems $menuItems
+    $selectionIndex = Show-ArrowMenu -Title "PowerShell Toolkit Runner" -MenuItems $menuItems -Banner $mainMenuBanner
     $selectedItem = $menuItems[$selectionIndex]
 
     if ($selectedItem.Name -eq "Exit") { break }
