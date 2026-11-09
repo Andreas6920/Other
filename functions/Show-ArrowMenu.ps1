@@ -11,8 +11,11 @@ function Show-ArrowMenu {
     while ($true) {
         Clear-Host
         if ($Banner) {
-            Write-Host $Banner.TrimEnd() -ForegroundColor Cyan
-            Write-Host
+            Write-Host "`n"
+            Write-Host $Banner.TrimEnd() -ForegroundColor Blue
+            Write-Host "`n"
+            Write-Host "Developer: Andreas6920 | Github: https://github.com/andreas6920"
+            Write-Host "============================================================================="
         }
         Write-Host $Title -ForegroundColor Gray
         Write-Host "Use Up/Down Arrow keys to navigate, Enter to select.`n" -ForegroundColor DarkGray
