@@ -27,7 +27,13 @@ $menuItems = @(
         if ($sandboxMenuPath -and (Test-Path -LiteralPath $sandboxMenuPath)) {
             & $sandboxMenuPath
         } else {
-            Invoke-Expression (Invoke-RestMethod "$RepoRawRoot/sandbox/Start-SandboxMenu.ps1")
+            $tempMenuScript = Join-Path ([IO.Path]::GetTempPath()) ("Start-SandboxMenu-{0}.ps1" -f [guid]::NewGuid().ToString('N'))
+            try {
+                Invoke-WebRequest -Uri "$RepoRawRoot/sandbox/Start-SandboxMenu.ps1" -OutFile $tempMenuScript -UseBasicParsing -ErrorAction Stop
+                & $tempMenuScript
+            } finally {
+                Remove-Item -LiteralPath $tempMenuScript -Force -ErrorAction SilentlyContinue
+            }
         }
     }; Executed = $false }
     @{ Name = "Module: Windows-Optimizer"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression }; Executed = $false }
