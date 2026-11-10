@@ -16,13 +16,13 @@ if ($menuHelperPath -and (Test-Path -LiteralPath $menuHelperPath)) {
     . ([scriptblock]::Create([string]$menuHelper))
 }
 
-$appsPath = if ($PSScriptRoot) { Join-Path $PSScriptRoot 'apps' } else { $null }
-if ($appsPath -and (Test-Path -LiteralPath $appsPath)) {
-    $appScripts = Get-ChildItem -LiteralPath $appsPath -Filter 'Install-*.ps1' -File | Sort-Object Name | ForEach-Object {
+$scriptsPath = if ($PSScriptRoot) { Join-Path $PSScriptRoot 'scripts' } else { $null }
+if ($scriptsPath -and (Test-Path -LiteralPath $scriptsPath)) {
+    $appScripts = Get-ChildItem -LiteralPath $scriptsPath -Filter 'Install-*.ps1' -File | Sort-Object Name | ForEach-Object {
         [pscustomobject]@{ Name = $_.Name; ScriptPath = $_.FullName; DownloadUrl = $null }
     }
 } else {
-    $remoteApps = Invoke-RestMethod -Uri 'https://api.github.com/repos/Andreas6920/Other/contents/sandbox/apps?ref=main' -Headers @{ 'User-Agent' = 'Other-Sandbox-Menu' } -ErrorAction Stop
+    $remoteApps = Invoke-RestMethod -Uri 'https://api.github.com/repos/Andreas6920/Other/contents/sandbox/scripts?ref=main' -Headers @{ 'User-Agent' = 'Other-Sandbox-Menu' } -ErrorAction Stop
     $appScripts = @(
         foreach ($remoteApp in $remoteApps) {
             if ($remoteApp.type -eq 'file' -and $remoteApp.name -like 'Install-*.ps1') {
@@ -35,7 +35,7 @@ if ($appsPath -and (Test-Path -LiteralPath $appsPath)) {
         }
     )
 }
-if (-not $appScripts) { throw 'No Install-*.ps1 scripts were found in the Sandbox apps folder.' }
+if (-not $appScripts) { throw 'No Install-*.ps1 scripts were found in the Sandbox scripts folder.' }
 
 $menuItems = @(
     foreach ($appScript in $appScripts) {
