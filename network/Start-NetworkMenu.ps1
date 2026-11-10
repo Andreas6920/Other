@@ -39,6 +39,8 @@ $menuItems = @(
             'Nirsoft IP Scanner'
         } elseif ($scriptName -eq 'Install-Speed-Test.ps1') {
             'Speed-Test'
+        } elseif ($scriptName -eq 'Install-DNSConfigurator.ps1') {
+            'DNS Configurator'
         } else {
             [IO.Path]::GetFileNameWithoutExtension($scriptName) -creplace '^Install-', '' -creplace '(?<=[a-z0-9])(?=[A-Z])', ' '
         }
