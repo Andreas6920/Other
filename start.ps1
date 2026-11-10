@@ -30,7 +30,21 @@ if ($MenuHelperPath -and (Test-Path -LiteralPath $MenuHelperPath)) {
 $menuItems = @(
     @{ Name = "Module: Windows-Optimizer"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Module: Windows-Server-Automator"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Windows-Server-Automator/main/Windows-Server-Automator.ps1" | Invoke-Expression }; Executed = $false }
-    @{ Name = "Windows Sandbox tools"; Action = {
+    @{ Name = "Module: Network Tools"; Action = {
+        $networkMenuPath = if ($ScriptRoot) { Join-Path $ScriptRoot "network\Start-NetworkMenu.ps1" } else { $null }
+        if ($networkMenuPath -and (Test-Path -LiteralPath $networkMenuPath)) {
+            & $networkMenuPath
+        } else {
+            $tempNetworkMenuScript = Join-Path ([IO.Path]::GetTempPath()) ("Start-NetworkMenu-{0}.ps1" -f [guid]::NewGuid().ToString('N'))
+            try {
+                Invoke-WebRequest -Uri "$RepoRawRoot/network/Start-NetworkMenu.ps1" -OutFile $tempNetworkMenuScript -UseBasicParsing -ErrorAction Stop
+                & $tempNetworkMenuScript
+            } finally {
+                Remove-Item -LiteralPath $tempNetworkMenuScript -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }; Executed = $false; SkipPause = $true }
+    @{ Name = "Module: Windows Sandbox Tools"; Action = {
         $sandboxMenuPath = if ($ScriptRoot) { Join-Path $ScriptRoot "sandbox\Start-SandboxMenu.ps1" } else { $null }
         if ($sandboxMenuPath -and (Test-Path -LiteralPath $sandboxMenuPath)) {
             & $sandboxMenuPath
@@ -55,20 +69,6 @@ $menuItems = @(
     @{ Name = "Activate Microsoft Office"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedOffice.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Activate Windows"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Get-ActivatedWindows.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install Microsoft Office 2016 Professional Retail"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/WinOptimizer/main/Winoptimizer.ps1" | Invoke-Expression; Install-App -Name Office }; Executed = $false }
-    @{ Name = "Network Tools"; Action = {
-        $networkMenuPath = if ($ScriptRoot) { Join-Path $ScriptRoot "network\Start-NetworkMenu.ps1" } else { $null }
-        if ($networkMenuPath -and (Test-Path -LiteralPath $networkMenuPath)) {
-            & $networkMenuPath
-        } else {
-            $tempNetworkMenuScript = Join-Path ([IO.Path]::GetTempPath()) ("Start-NetworkMenu-{0}.ps1" -f [guid]::NewGuid().ToString('N'))
-            try {
-                Invoke-WebRequest -Uri "$RepoRawRoot/network/Start-NetworkMenu.ps1" -OutFile $tempNetworkMenuScript -UseBasicParsing -ErrorAction Stop
-                & $tempNetworkMenuScript
-            } finally {
-                Remove-Item -LiteralPath $tempNetworkMenuScript -Force -ErrorAction SilentlyContinue
-            }
-        }
-    }; Executed = $false; SkipPause = $true }
     @{ Name = "Install Zero Tier"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-ZeroTier.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install WizTree"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/refs/heads/main/scripts/Install-WizTree.ps1" | Invoke-Expression }; Executed = $false }
     @{ Name = "Install Driver Installer"; Action = { Invoke-RestMethod "https://raw.githubusercontent.com/Andreas6920/Other/main/scripts/SDI-Tool.ps1" | Invoke-Expression }; Executed = $false }
