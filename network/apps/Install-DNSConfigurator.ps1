@@ -102,7 +102,6 @@ $dnsOptions = @(
     @{ Name = 'Cloudflare Kids'; ServerAddresses = @('1.1.1.3', '1.0.0.3'); Executed = $false }
     @{ Name = 'Google'; ServerAddresses = @('8.8.8.8', '8.8.4.4'); Executed = $false }
     @{ Name = 'Quad9'; ServerAddresses = @('9.9.9.9', '149.112.112.112'); Executed = $false }
-    @{ Name = 'Mullvad'; ServerAddresses = @('194.242.2.4', '194.242.2.2'); Executed = $false }
     @{ Name = 'Return'; ServerAddresses = $null; Executed = $false }
 )
 
@@ -123,25 +122,40 @@ while ($true) {
     }
 
     Set-DnsClientServerAddress -InterfaceAlias $nic -ServerAddresses $selectedOption.ServerAddresses | Out-Null
+    Clear-DnsClientCache -ErrorAction Stop
     Write-Host ("Applying {0} DNS to {1}..." -f $selectedOption.Name, $nic) -ForegroundColor Cyan
 
     $connected = $false
+    $lastDnsError = $null
     for ($attempt = 0; $attempt -lt 20; $attempt++) {
-        Start-Sleep -Seconds 3
-        if (Test-Connection -ComputerName 'google.com' -Count 1 -Quiet -ErrorAction SilentlyContinue) {
-            $connected = $true
-            break
+        try {
+            $dnsResult = Resolve-DnsName -Name 'google.com' -Type A -DnsOnly -ErrorAction Stop
+            if ($dnsResult | Where-Object { $_.IPAddress }) {
+                $connected = $true
+                break
+            }
+        } catch {
+            $lastDnsError = $_.Exception.Message
+        }
+
+        if ($attempt -lt 19) {
+            Start-Sleep -Seconds 3
         }
     }
 
     if (-not $connected) {
-        # Restore the previous DNS mode if connectivity did not recover within one minute.
+        # Restore the previous DNS mode if name resolution did not recover within one minute.
         if ($currentDnsServers) {
             Set-DnsClientServerAddress -InterfaceAlias $nic -ServerAddresses $currentDnsServers | Out-Null
         } else {
             Set-DnsClientServerAddress -InterfaceAlias $nic -ResetServerAddresses | Out-Null
         }
-        throw 'Internet connectivity did not recover within 60 seconds. The previous DNS settings were restored.'
+        Clear-DnsClientCache -ErrorAction SilentlyContinue
+        $failureMessage = 'DNS resolution did not succeed within 60 seconds. The previous DNS settings were restored.'
+        if ($lastDnsError) {
+            $failureMessage += " Last error: $lastDnsError"
+        }
+        throw $failureMessage
     }
 
     $currentDnsServers = @(
