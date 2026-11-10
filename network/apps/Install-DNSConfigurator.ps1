@@ -96,15 +96,6 @@ function Write-NetworkConfiguration {
     Write-Host $(if ($DnsServers) { $DnsServers -join ', ' } else { 'Automatic (DHCP)' })
 }
 
-$menuHeader = {
-    Write-Host 'Network Configuration:' -ForegroundColor Cyan
-    Write-Host ("  - Interface: {0}" -f $nic)
-    Write-Host ("  - IP: {0}" -f $ipAddress)
-    Write-Host ("  - Gateway: {0}" -f $gateway)
-    Write-Host '  - DNS: ' -NoNewline -ForegroundColor Cyan
-    Write-Host $(if ($currentDnsServers) { $currentDnsServers -join ', ' } else { 'Automatic (DHCP)' })
-}.GetNewClosure()
-
 $dnsOptions = @(
     @{ Name = 'Cloudflare + Google'; ServerAddresses = @('1.1.1.1', '8.8.8.8'); Executed = $false }
     @{ Name = 'Cloudflare'; ServerAddresses = @('1.1.1.1', '1.0.0.1'); Executed = $false }
@@ -115,40 +106,53 @@ $dnsOptions = @(
     @{ Name = 'Return'; ServerAddresses = $null; Executed = $false }
 )
 
-$selectionIndex = Show-ArrowMenu -Title 'Choose a DNS configuration' -MenuItems $dnsOptions -Header $menuHeader -Separator
-$selectedOption = $dnsOptions[$selectionIndex]
-if ($selectedOption.Name -eq 'Return') {
-    return
-}
+while ($true) {
+    $menuHeader = {
+        Write-Host 'Network Configuration:' -ForegroundColor Cyan
+        Write-Host ("  - Interface: {0}" -f $nic)
+        Write-Host ("  - IP: {0}" -f $ipAddress)
+        Write-Host ("  - Gateway: {0}" -f $gateway)
+        Write-Host '  - DNS: ' -NoNewline -ForegroundColor Cyan
+        Write-Host $(if ($currentDnsServers) { $currentDnsServers -join ', ' } else { 'Automatic (DHCP)' })
+    }.GetNewClosure()
 
-Set-DnsClientServerAddress -InterfaceAlias $nic -ServerAddresses $selectedOption.ServerAddresses | Out-Null
-Write-Host ("Applying {0} DNS to {1}..." -f $selectedOption.Name, $nic) -ForegroundColor Cyan
-
-$connected = $false
-for ($attempt = 0; $attempt -lt 20; $attempt++) {
-    Start-Sleep -Seconds 3
-    if (Test-Connection -ComputerName 'google.com' -Count 1 -Quiet -ErrorAction SilentlyContinue) {
-        $connected = $true
+    $selectionIndex = Show-ArrowMenu -Title 'Choose a DNS configuration' -MenuItems $dnsOptions -Header $menuHeader -Separator
+    $selectedOption = $dnsOptions[$selectionIndex]
+    if ($selectedOption.Name -eq 'Return') {
         break
     }
-}
 
-if (-not $connected) {
-    # Restore the previous DNS mode if connectivity did not recover within one minute.
-    if ($currentDnsServers) {
-        Set-DnsClientServerAddress -InterfaceAlias $nic -ServerAddresses $currentDnsServers | Out-Null
-    } else {
-        Set-DnsClientServerAddress -InterfaceAlias $nic -ResetServerAddresses | Out-Null
+    Set-DnsClientServerAddress -InterfaceAlias $nic -ServerAddresses $selectedOption.ServerAddresses | Out-Null
+    Write-Host ("Applying {0} DNS to {1}..." -f $selectedOption.Name, $nic) -ForegroundColor Cyan
+
+    $connected = $false
+    for ($attempt = 0; $attempt -lt 20; $attempt++) {
+        Start-Sleep -Seconds 3
+        if (Test-Connection -ComputerName 'google.com' -Count 1 -Quiet -ErrorAction SilentlyContinue) {
+            $connected = $true
+            break
+        }
     }
-    throw 'Internet connectivity did not recover within 60 seconds. The previous DNS settings were restored.'
-}
 
-$updatedDnsServers = @(
-    Get-DnsClientServerAddress -InterfaceIndex $interfaceIndex -AddressFamily IPv4 -ErrorAction Stop |
-        ForEach-Object { $_.ServerAddresses } |
-        Where-Object { $_ }
-)
-Clear-Host
-Write-NetworkConfiguration -Interface $nic -IPAddress $ipAddress -Gateway $gateway -DnsServers $updatedDnsServers
-Write-Host ''
-Write-Host ("DNS updated successfully: {0}" -f ($selectedOption.ServerAddresses -join ', ')) -ForegroundColor Green
+    if (-not $connected) {
+        # Restore the previous DNS mode if connectivity did not recover within one minute.
+        if ($currentDnsServers) {
+            Set-DnsClientServerAddress -InterfaceAlias $nic -ServerAddresses $currentDnsServers | Out-Null
+        } else {
+            Set-DnsClientServerAddress -InterfaceAlias $nic -ResetServerAddresses | Out-Null
+        }
+        throw 'Internet connectivity did not recover within 60 seconds. The previous DNS settings were restored.'
+    }
+
+    $currentDnsServers = @(
+        Get-DnsClientServerAddress -InterfaceIndex $interfaceIndex -AddressFamily IPv4 -ErrorAction Stop |
+            ForEach-Object { $_.ServerAddresses } |
+            Where-Object { $_ }
+    )
+    $selectedOption.Executed = $true
+    Clear-Host
+    Write-NetworkConfiguration -Interface $nic -IPAddress $ipAddress -Gateway $gateway -DnsServers $currentDnsServers
+    Write-Host ''
+    Write-Host ("DNS updated successfully: {0}" -f ($selectedOption.ServerAddresses -join ', ')) -ForegroundColor Green
+    Start-Sleep -Seconds 2
+}
