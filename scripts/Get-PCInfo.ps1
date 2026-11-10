@@ -1,5 +1,6 @@
 Write-Host "Gathering information" -NoNewline
 $cs  = Get-CimInstance Win32_ComputerSystem
+$computerName = $env:COMPUTERNAME
 $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
 $bios = Get-CimInstance Win32_BIOS
 
@@ -82,6 +83,7 @@ $dnsServers = @(
 $dnsText = if ($dnsServers) { $dnsServers -join ", " } else { "Unknown" }
 
 Clear-Host
+Write-Host ("Name: {0}" -f $computerName) -ForegroundColor Cyan
 Write-Host "Device:" -ForegroundColor Cyan
 Write-Host ("  - Type: {0}" -f $type)
 Write-Host ("  - Model: {0}" -f $model)
