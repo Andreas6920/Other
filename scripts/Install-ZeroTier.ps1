@@ -1,4 +1,4 @@
-﻿# Join zerotier ID
+# Join zerotier ID
     $networkid = Read-Host -Prompt "    Enter Zerotier Network id"
 
 # Test if ZeroTier is installed on this system
